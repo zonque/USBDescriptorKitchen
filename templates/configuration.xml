@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<descriptor type="ConfigurationDescriptor">
+	<element type="auto" size="1" name="bLength" method="descriptorSize" />
+	<element type="constant" size="1" name="bDescriptorType" value="2" />
+	<element type="auto" size="2" name="wTotalLength" method="descriptorSizeAllChildren" />
+	<element type="auto" size="1" name="bNumInterfaces" method="countChildrenOfType:InterfaceDescriptor" />
+	<element type="auto" size="1" name="bConfigurationValue" method="indexOfDescriptor" base="1" />
+	<element type="link" size="1" name="iConfiguration" linktype="stringIndex" />
+	<element type="variable" size="1" name="bDeviceProtocol" value="0" />
+	<element type="variable" size="1" name="bmAttributes" value="0" />
+	<element type="variable" size="1" name="bMaxPower" value="0" />
+</descriptor>
