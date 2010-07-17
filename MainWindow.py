@@ -31,7 +31,7 @@ class MainWindow(wx.Panel):
 		tree = self.descriptorTree
 
 		deviceDescriptor = Template.parseTemplateFromFile("templates/device.xml")
-		tree.descriptors.append(deviceDescriptor)
+		#tree.descriptors.append(deviceDescriptor)
 
 
 		configDescriptor = Template.parseTemplateFromFile("templates/configuration.xml")
@@ -45,19 +45,19 @@ class MainWindow(wx.Panel):
 		i.addChild(ep)
 		configDescriptor.addChild(i)
 		configDescriptor.addChild(i)
-		tree.descriptors.append(configDescriptor)
+		#tree.descriptors.append(configDescriptor)
 
 
 		configDescriptor = Template.parseTemplateFromFile("templates/configuration.xml")
-		tree.descriptors.append(configDescriptor)
+		#tree.descriptors.append(configDescriptor)
 
 		qual = Template.parseTemplateFromFile("templates/devicequalifier.xml")
-		tree.descriptors.append(qual)
+		#tree.descriptors.append(qual)
 
 		string = Template.parseTemplateFromFile("templates/string.xml")
-		tree.descriptors.append(string)
+		#tree.descriptors.append(string)
 
-		tree.BuildTree()
+		#tree.BuildTree()
 
 		parent.setTree(tree)
 
@@ -79,7 +79,10 @@ class MainFrame(wx.Frame):
 		menuBar.Append(menu1, "&File")
 
 		menu2 = wx.Menu()
-		menu2.Append(201, "&Dump", "")
+		menu2.Append(201, "&Add", "")
+		menu2.Append(202, "&Remove", "")
+		menu2.AppendSeparator()
+		menu2.Append(203, "&Dump", "")
 		menuBar.Append(menu2, "&Descriptor set")
 
 		self.SetMenuBar(menuBar)
@@ -87,16 +90,24 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.OnOpen, id=101)
 		self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=104)
 
-		self.Bind(wx.EVT_MENU, self.OnDump, id=201)
+		self.Bind(wx.EVT_MENU, self.OnAddDescriptor, id=201)
+		self.Bind(wx.EVT_MENU, self.OnRemoveDescriptor, id=202)
+		self.Bind(wx.EVT_MENU, self.OnDump, id=203)
 
 	def OnCloseWindow(self, event):
 		self.Close()
 
 	def OnOpen(self, event):
-		Template.parseTemplateFromFile("templates/device.xml")
+		print "open"
 
 	def OnDump(self, event):
 		typecount = {}
+
+		print
+		print "/*****************************************************************/"
+		print "/* automatically generated. do not edit. */"
+		print "/*****************************************************************/"
+		print
 
 		for d in self.tree.descriptors:
 			t = d.descriptorType;
@@ -110,6 +121,23 @@ class MainFrame(wx.Frame):
 			print "static const char %s_%d[] = {" % (t, n)
 			d.dumpC()
 			print "};\n"
+
+		for key in typecount:
+			val = typecount[key]
+
+			print "static const char *%ss[] = {" % key
+
+			for n in range(val):
+				print "\t%s_%d," % (key, n + 1)
+
+			print "};\n"
+
+	def OnAddDescriptor(self, event):
+		desc = Template.parseTemplateFromFile("templates/configuration.xml")
+		self.tree.AddDescriptor(desc)
+
+	def OnRemoveDescriptor(self, event):
+		self.tree.RemoveSelectedDescriptor()
 
 	def setTree(self, tree):
 		self.tree = tree

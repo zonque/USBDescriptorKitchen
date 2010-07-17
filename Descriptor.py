@@ -61,12 +61,28 @@ class DescriptorElementClass:
 		    len(self.enumVals) == 0):
 			print "DEBUG %s: no ENUMs given." % self.name
 
+	def getEnumKey(self, val = None):
+		if not val:
+			val = self.value
+
+		idx = 0
+		for v in self.enumVals:
+			if (self.convertToInt(self.value) == self.convertToInt(v)):
+				value = self.enumKeys[idx]
+
+			idx += 1
+
+		return value
+
 	def prettyPrint(self, value = None):
 		if not value:
 			value = self.value
 
 		if (self.elementType == self.ELEMENT_TYPE_STRING):
 			return self.strValue
+
+		if self.elementType == self.ELEMENT_TYPE_ENUM:
+			return self.getEnumKey(self.value)
 
 		if (self.elementType == self.ELEMENT_TYPE_BITMAP):
 			self.displayFormat = "hex"
@@ -84,6 +100,7 @@ class DescriptorElementClass:
 			s = "%d" % self.convertToInt(str(value))
 
 		return s
+
 
 	def dumpValueNoComma(self, value = None):
 		if not value:
@@ -119,7 +136,13 @@ class DescriptorElementClass:
 		print "%s%s/* %s" % (dump, padding, self.name) ,
 
 		if (self.comment != ""):
-			print "\t(%s)" % self.comment ,
+			print "(%s) " % self.comment ,
+
+		if (self.elementType == self.ELEMENT_TYPE_ENUM):
+			print "(\"%s\") " % self.getEnumKey() ,
+
+		if self.size > 1:
+			print "(%d) " % self.value ,
 
 		print "*/"
 
@@ -235,8 +258,6 @@ class DescriptorClass:
 
 		for e in self.elements:
 			e.dumpC(indent)
-
-		print ""
 
 		for c in self.children:
 			c.dumpC(indent)

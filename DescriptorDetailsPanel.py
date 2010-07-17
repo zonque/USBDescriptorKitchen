@@ -79,16 +79,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 			return e.name
 
 		if column == 1:
-			value = e.prettyPrint()
-
-			if (e.elementType == e.ELEMENT_TYPE_ENUM):
-				idx = 0
-				for v in e.enumVals:
-					if (e.convertToInt(e.value) == e.convertToInt(v)):
-						value = e.enumKeys[idx]
-
-					idx += 1
-			return value
+			return e.prettyPrint()
 
 		if column == 2:
 			etype = "UNKNOWN"
@@ -145,7 +136,6 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		selected = event.GetId()
 		e = self.editedElement
 		self.editedElement = None
-
 		e.setValue(e.enumVals[selected])
 
 		event.Skip()
@@ -180,4 +170,7 @@ class DescriptorDetailsPanel(wx.Panel):
 
 	def SetDescriptor(self, descriptor):
 		self.detailsList.SetDescriptor(descriptor)
+
+	def RefreshItems(self):
+		self.detailsList.RefreshItems()
 
