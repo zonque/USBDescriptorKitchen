@@ -29,11 +29,11 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.OnEndLabelEdit)
 
 	def OnBeginLabelEdit(self, event):
-		index = self.GetIndexOfItem(event.GetItem())[0]
+		indices = self.GetIndexOfItem(event.GetItem())
+		e = self.descriptor.elements[indices[0]]
 
-		e = self.descriptor.elements[index]
-		#item = self.GetItem(row, col).GetId()
-		#print "item %d, col %d row %d" % (item, col, row)
+		if len(indices) == 2:
+			e = e.bitmap[indices[1]]
 
 		if (e.elementType == e.ELEMENT_TYPE_VARIABLE or
 		    e.elementType == e.ELEMENT_TYPE_STRING):
@@ -65,14 +65,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 
 	def OnEndLabelEdit(self, event):
 		e = self.editedElement
-
-		if e.elementType == e.ELEMENT_TYPE_STRING:
-			e.strValue = event.GetLabel()
-			e.comment = "\"%s\"" % e.strValue
-		else:
-			mask = (1 << (e.size * 8)) - 1
-			e.value = e.convertToInt(event.GetLabel()) & mask
-
+		e.setValue(event.GetLabel())
 		self.descriptor.handleAutoFields()
 		self.RefreshItems()
 
@@ -153,7 +146,8 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		e = self.editedElement
 		self.editedElement = None
 
-		e.value = e.enumVals[selected]
+		e.setValue(e.enumVals[selected])
+
 		event.Skip()
 		self.RefreshItems()
 

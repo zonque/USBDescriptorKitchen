@@ -78,6 +78,7 @@ def parseTemplateFromFile(filename):
 			for v in e.getElementsByTagName("bitmap"):
 
 				bitmap = Descriptor.DescriptorElementClass()
+				bitmap.parentElement = newElement
 
 				bitmap.name = v.attributes["name"].nodeValue
 				bitmap.offset = int(v.attributes["offset"].nodeValue)
@@ -91,6 +92,16 @@ def parseTemplateFromFile(filename):
 					bitmap.elementType = newElement.ELEMENT_TYPE_CONSTANT
 				if (bitmapType == "enum"):
 					bitmap.elementType = newElement.ELEMENT_TYPE_ENUM
+
+				if (bitmap.elementType == bitmap.ELEMENT_TYPE_ENUM):
+					for ve in v.getElementsByTagName("item"):
+						val = getText(ve.childNodes)
+						key = ve.getAttribute("name")
+						if (key == ""):
+							key = val
+
+						bitmap.enumVals.append(val)
+						bitmap.enumKeys.append(key)
 
 				newElement.bitmap.append(bitmap)
 

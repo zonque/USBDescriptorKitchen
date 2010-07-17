@@ -28,6 +28,7 @@ class DescriptorElementClass:
 		self.possibleLinkedDescriptors = []
 		self.autoMethod = ""
 		self.autoMethodDetail = 0
+		self.parentElement = None
 
 	def convertToInt(self, data):
 		if (type(data) is int):
@@ -67,6 +68,9 @@ class DescriptorElementClass:
 		if (self.elementType == self.ELEMENT_TYPE_STRING):
 			return self.strValue
 
+		if (self.elementType == self.ELEMENT_TYPE_BITMAP):
+			self.displayFormat = "hex"
+
 		if (self.displayFormat == "hex"):
 			if (self.size == 1):
 				s = "0x%02x" % value
@@ -98,12 +102,10 @@ class DescriptorElementClass:
 	def dumpHex(self):
 		s = ""
 		if self.elementType == self.ELEMENT_TYPE_STRING:
-			try:
-				for i in range(len(self.strValue)):
-					s += "0x%02x, " % ord(self.strValue[i])
-			except:
-				# empty
-				raise
+			for i in range(len(self.strValue)):
+				# FIXME: this works for ASCII only
+				s += "0x%02x, " % ord(self.strValue[i])
+				s += "0x00, "
 		else:
 			for i in range(self.size):
 				s += "0x%02x, " % ((self.value >> (i * 8)) & 0xff)
@@ -124,9 +126,30 @@ class DescriptorElementClass:
 	def updateSize(self):
 		if self.elementType == self.ELEMENT_TYPE_STRING:
 			try:
-				self.size = len(self.strValue)
+				self.size = len(self.strValue) * 2 # UNICODE
 			except:
 				self.size = 0
+	def setValue(self, value):
+		p = self.parentElement
+
+		if self.elementType == self.ELEMENT_TYPE_STRING:
+			self.strValue = value
+			self.comment = "\"%s\"" % e.strValue
+			return
+
+		if p:
+			# handle bitmap elements
+			if p.elementType == self.ELEMENT_TYPE_BITMAP:
+				mask = (1 << self.size) - 1
+				self.value = self.convertToInt(value)
+				v = p.value
+				v &= ~(mask << self.offset)
+				v |= self.value << self.offset
+				p.value = v
+		else:
+			mask = (1 << (self.size * 8)) - 1
+			self.value = self.convertToInt(value) & mask
+
 
 class DescriptorClass:
 	comment = ""
