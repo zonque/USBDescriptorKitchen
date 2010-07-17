@@ -10,6 +10,7 @@ class DescriptorElementClass:
 	ELEMENT_TYPE_AUTO = 4
 	ELEMENT_TYPE_LINK = 5
 	ELEMENT_TYPE_BITMAP = 6
+	ELEMENT_TYPE_STRING = 7
 
 	def __init__(self):
 		self.elementType = self.ELEMENT_TYPE_UNKNOWN
@@ -18,6 +19,7 @@ class DescriptorElementClass:
 		self.comment = ""
 		self.size = 0
 		self.value = 0
+		self.strValue = ""
 		self.displayValue = ""
 		self.base = 0
 		self.enumVals = []
@@ -62,6 +64,9 @@ class DescriptorElementClass:
 		if not value:
 			value = self.value
 
+		if (self.elementType == self.ELEMENT_TYPE_STRING):
+			return self.strValue
+
 		if (self.displayFormat == "hex"):
 			if (self.size == 1):
 				s = "0x%02x" % value
@@ -92,8 +97,16 @@ class DescriptorElementClass:
 
 	def dumpHex(self):
 		s = ""
-		for i in range(self.size):
-			s += "0x%02x, " % ((self.value >> (i * 8)) & 0xff)
+		if self.elementType == self.ELEMENT_TYPE_STRING:
+			try:
+				for i in range(len(self.strValue)):
+					s += "0x%02x, " % ord(self.strValue[i])
+			except:
+				# empty
+				raise
+		else:
+			for i in range(self.size):
+				s += "0x%02x, " % ((self.value >> (i * 8)) & 0xff)
 
 		return s
 
@@ -108,6 +121,13 @@ class DescriptorElementClass:
 
 		print "*/"
 
+	def updateSize(self):
+		if self.elementType == self.ELEMENT_TYPE_STRING:
+			try:
+				self.size = len(self.strValue)
+			except:
+				self.size = 0
+
 class DescriptorClass:
 	comment = ""
 	descriptorType = ""
@@ -121,6 +141,7 @@ class DescriptorClass:
 		size = 0
 
 		for e in self.elements:
+			e.updateSize()
 			e.checkIntegrity()
 			size += e.size
 

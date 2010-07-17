@@ -46,6 +46,8 @@ def parseTemplateFromFile(filename):
 					newElement.elementType = newElement.ELEMENT_TYPE_LINK
 				if (a.nodeValue == "bitmap"):
 					newElement.elementType = newElement.ELEMENT_TYPE_BITMAP
+				if (a.nodeValue == "string"):
+					newElement.elementType = newElement.ELEMENT_TYPE_STRING
 
 			if (a.name == "name"):
 				newElement.name = a.nodeValue

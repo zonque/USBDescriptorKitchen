@@ -35,7 +35,8 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		#item = self.GetItem(row, col).GetId()
 		#print "item %d, col %d row %d" % (item, col, row)
 
-		if (e.elementType == e.ELEMENT_TYPE_VARIABLE):
+		if (e.elementType == e.ELEMENT_TYPE_VARIABLE or
+		    e.elementType == e.ELEMENT_TYPE_STRING):
 			self.editedElement = e
 			return
 
@@ -65,10 +66,14 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 	def OnEndLabelEdit(self, event):
 		e = self.editedElement
 
-		if e:
+		if e.elementType == e.ELEMENT_TYPE_STRING:
+			e.strValue = event.GetLabel()
+			e.comment = "\"%s\"" % e.strValue
+		else:
 			mask = (1 << (e.size * 8)) - 1
 			e.value = e.convertToInt(event.GetLabel()) & mask
 
+		self.descriptor.handleAutoFields()
 		self.RefreshItems()
 
 	def OnGetItemText(self, indices, column=0):
@@ -107,6 +112,8 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 				etype = "enumerated"
 			if e.elementType == e.ELEMENT_TYPE_BITMAP:
 				etype = "bitmap"
+			if e.elementType == e.ELEMENT_TYPE_STRING:
+				etype = "string"
 
 			return etype
 
