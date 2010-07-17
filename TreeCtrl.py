@@ -121,135 +121,6 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		dlg.Destroy()
 
 
-	def OnItemHyperText(self, event):
-
-		self.SetItemHyperText(self.current, not self.itemdict["ishtml"])
-
-
-	def OnEnableWindow(self, event):
-
-		enable = self.GetItemWindowEnabled(self.current)
-		self.SetItemWindowEnabled(self.current, not enable)
-
-
-	def OnDisableItem(self, event):
-
-		self.EnableItem(self.current, False)
-
-	def OnItemInfo(self, event):
-
-		itemtext = self.itemdict["text"]
-		numchildren = str(self.itemdict["children"])
-		itemtype = self.itemdict["itemtype"]
-		pydata = repr(type(self.itemdict["pydata"]))
-
-		if itemtype == 0:
-			itemtype = "Normal"
-		elif itemtype == 1:
-			itemtype = "CheckBox"
-		else:
-			itemtype = "RadioButton"
-
-		strs = "Information On Selected Item:\n\n" + "Text: " + itemtext + "\n" \
-			   "Number Of Children: " + numchildren + "\n" \
-			   "Item Type: " + itemtype + "\n" \
-			   "Item Data Type: " + pydata + "\n"
-
-		dlg = wx.MessageDialog(self, strs, "CustomTreeCtrlDemo Info", wx.OK | wx.ICON_INFORMATION)
-		dlg.ShowModal()
-		dlg.Destroy()
-
-
-
-	def OnItemDelete(self, event):
-
-		strs = "Are You Sure You Want To Delete Item " + self.GetItemText(self.current) + "?"
-		dlg = wx.MessageDialog(None, strs, 'Deleting Item', wx.YES_NO | wx.NO_DEFAULT | wx.CANCEL | wx.ICON_QUESTION)
-
-		if dlg.ShowModal() in [wx.ID_NO, wx.ID_CANCEL]:
-			dlg.Destroy()
-			return
-
-		dlg.Destroy()
-
-		self.DeleteChildren(self.current)
-		self.Delete(self.current)
-		self.current = None
-
-
-
-	def OnItemPrepend(self, event):
-
-		dlg = wx.TextEntryDialog(self, "Please Enter The New Item Name", 'Item Naming', 'Python')
-
-		if dlg.ShowModal() == wx.ID_OK:
-			newname = dlg.GetValue()
-			newitem = self.PrependItem(self.current, newname)
-			self.EnsureVisible(newitem)
-
-		dlg.Destroy()
-
-
-	def OnItemAppend(self, event):
-
-		dlg = wx.TextEntryDialog(self, "Please Enter The New Item Name", 'Item Naming', 'Python')
-
-		if dlg.ShowModal() == wx.ID_OK:
-			newname = dlg.GetValue()
-			newitem = self.AppendItem(self.current, newname)
-			self.EnsureVisible(newitem)
-
-		dlg.Destroy()
-
-
-	def OnBeginEdit(self, event):
-
-		self.log.write("OnBeginEdit" + "\n")
-		# show how to prevent edit...
-		item = event.GetItem()
-		if item and self.GetItemText(item) == "The Root Item":
-			wx.Bell()
-			self.log.write("You can't edit this one..." + "\n")
-
-			# Lets just see what's visible of its children
-			cookie = 0
-			root = event.GetItem()
-			(child, cookie) = self.GetFirstChild(root)
-
-			while child:
-				self.log.write("Child [%s] visible = %d" % (self.GetItemText(child), self.IsVisible(child)) + "\n")
-				(child, cookie) = self.GetNextChild(root, cookie)
-
-			event.Veto()
-
-
-	def OnEndEdit(self, event):
-
-		self.log.write("OnEndEdit: %s %s" %(event.IsEditCancelled(), event.GetLabel()))
-		# show how to reject edit, we'll not allow any digits
-		for x in event.GetLabel():
-			if x in string.digits:
-				self.log.write(", You can't enter digits..." + "\n")
-				event.Veto()
-				return
-
-		self.log.write("\n")
-
-
-	def OnLeftDClick(self, event):
-
-		pt = event.GetPosition()
-		item, flags = self.HitTest(pt)
-		if item and (flags & CT.TREE_HITTEST_ONITEMLABEL):
-			if self.GetTreeStyle() & CT.TR_EDIT_LABELS:
-				self.log.write("OnLeftDClick: %s (manually starting label edit)"% self.GetItemText(item) + "\n")
-				self.EditLabel(item)
-			else:
-				self.log.write("OnLeftDClick: Cannot Start Manual Editing, Missing Style TR_EDIT_LABELS\n")
-
-		event.Skip()
-
-
 	def OnSelChanged(self, event):
 
 		for d in self.descriptors:
@@ -273,15 +144,6 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 			event.Allow()
 
 
-	def OnBeginRDrag(self, event):
-
-		self.item = event.GetItem()
-		if self.item:
-			self.log.write("Beginning Right Drag..." + "\n")
-
-			event.Allow()
-
-
 	def OnEndDrag(self, event):
 
 		self.item = event.GetItem()
@@ -290,47 +152,9 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
 		event.Skip()
 
-
-	def OnDeleteItem(self, event):
-
-		item = event.GetItem()
-
-		if not item:
+	def RemoveSelectedDescriptor(self):
+		if not self.selectedDescriptor:
 			return
 
-		self.log.write("Deleting Item: %s" % self.GetItemText(item) + "\n")
-		event.Skip()
-
-
-	def OnItemCheck(self, event):
-
-		item = event.GetItem()
-		self.log.write("Item " + self.GetItemText(item) + " Has Been Checked!\n")
-		event.Skip()
-
-
-	def OnItemChecking(self, event):
-
-		item = event.GetItem()
-		self.log.write("Item " + self.GetItemText(item) + " Is Being Checked...\n")
-		event.Skip()
-
-
-	def OnToolTip(self, event):
-
-		item = event.GetItem()
-		if item:
-			event.SetToolTip(wx.ToolTip(self.GetItemText(item)))
-
-
-	def OnItemMenu(self, event):
-
-		item = event.GetItem()
-		if item:
-			self.log.write("OnItemMenu: %s" % self.GetItemText(item) + "\n")
-
-		event.Skip()
-
-	def RemoveSelectedDescriptor(self):
 		print "bla"
 
