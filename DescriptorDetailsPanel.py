@@ -53,7 +53,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 				else:
 					title = k
 
-				item = wx.MenuItem(menu, idx, title)
+				item = wx.MenuItem(menu, idx + 1, title)
 				menu.AppendItem(item)
 				idx += 1
 
@@ -133,7 +133,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		return wx.BLACK
 
 	def OnEnumSelected(self, event):
-		selected = event.GetId()
+		selected = event.GetId() - 1
 		e = self.editedElement
 		self.editedElement = None
 		e.setValue(e.enumVals[selected])
