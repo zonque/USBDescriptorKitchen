@@ -3,8 +3,32 @@
 <descriptor type="EndpointDescriptor">
 	<element type="auto" size="1" name="bDescriptorSize" method="descriptorSize" />
 	<element type="constant" size="1" name="bDescriptorType" value="5" />
-	<element type="variable" size="1" name="bEndpointAddress" value="0" />
-	<element type="variable" size="1" name="bmAttributes" value="0" />
+	<element type="bitmap" size="1" name="bEndpointAddress" value="0">
+		<bitmap type="variable" size="4" offset="0" name="Endpoint Number" />
+		<bitmap type="enum" size="1" offset="7" name="Direction">
+			<item name="OUT">0</item>
+			<item name="IN">1</item>
+		</bitmap>
+	</element>
+	<element type="bitmap" size="1" name="bEndpointAttributes" value="0">
+		<bitmap type="enum" size="2" offset="0" name="Transfer Type">
+			<item name="Control">0x0</item>
+			<item name="Isochronous">0x1</item>
+			<item name="Bulk">0x2</item>
+			<item name="Interrupt">0x3</item>
+		</bitmap>
+		<bitmap type="enum" size="2" offset="0" name="Synchronization Type">
+			<item name="No Synchronization">0x0</item>
+			<item name="Asynchronous">0x1</item>
+			<item name="Adaptive">0x2</item>
+			<item name="Syncronous">0x3</item>
+		</bitmap>
+		<bitmap type="enum" size="2" offset="0" name="Usage Type">
+			<item name="Data Endpoint">0x0</item>
+			<item name="Feedback Endpoint">0x1</item>
+			<item name="Implcit Feedback Data Endpoint">0x2</item>
+		</bitmap>
+	</element>
 	<element type="variable" size="2" name="wMaxPacketSize" value="0" />
 	<element type="variable" size="1" name="bInterval" value="0" />
 </descriptor>

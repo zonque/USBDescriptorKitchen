@@ -9,6 +9,7 @@ class DescriptorElementClass:
 	ELEMENT_TYPE_ENUM = 3
 	ELEMENT_TYPE_AUTO = 4
 	ELEMENT_TYPE_LINK = 5
+	ELEMENT_TYPE_BITMAP = 6
 
 	def __init__(self):
 		self.elementType = self.ELEMENT_TYPE_UNKNOWN
@@ -21,6 +22,7 @@ class DescriptorElementClass:
 		self.base = 0
 		self.enumVals = []
 		self.enumKeys = []
+		self.bitmap = []
 		self.possibleLinkedDescriptors = []
 		self.autoMethod = ""
 		self.autoMethodDetail = 0

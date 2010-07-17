@@ -44,6 +44,8 @@ def parseTemplateFromFile(filename):
 					newElement.elementType = newElement.ELEMENT_TYPE_AUTO
 				if (a.nodeValue == "link"):
 					newElement.elementType = newElement.ELEMENT_TYPE_LINK
+				if (a.nodeValue == "bitmap"):
+					newElement.elementType = newElement.ELEMENT_TYPE_BITMAP
 
 			if (a.name == "name"):
 				newElement.name = a.nodeValue
@@ -69,6 +71,26 @@ def parseTemplateFromFile(filename):
 
 				newElement.enumVals.append(val)
 				newElement.enumKeys.append(key)
+
+		if (newElement.elementType == newElement.ELEMENT_TYPE_BITMAP):
+			for v in e.getElementsByTagName("bitmap"):
+
+				bitmap = Descriptor.DescriptorElementClass()
+
+				bitmap.name = v.attributes["name"].nodeValue
+				bitmap.offset = int(v.attributes["offset"].nodeValue)
+				bitmap.size = int(v.attributes["size"].nodeValue)
+
+				bitmapType = v.attributes["type"].nodeValue
+
+				if (bitmapType == "variable"):
+					bitmap.elementType = newElement.ELEMENT_TYPE_VARIABLE
+				if (bitmapType == "constant"):
+					bitmap.elementType = newElement.ELEMENT_TYPE_CONSTANT
+				if (bitmapType == "enum"):
+					bitmap.elementType = newElement.ELEMENT_TYPE_ENUM
+
+				newElement.bitmap.append(bitmap)
 
 		newDescriptor.addElement(newElement)
 

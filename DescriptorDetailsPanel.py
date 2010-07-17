@@ -3,74 +3,46 @@ import string
 import os
 import sys
 
+import wx.gizmos
 import wx.lib.mixins.listctrl  as  listmix
+from wx.lib.mixins import treemixin
 import Descriptor
 
-class DescriptorDetailsList(wx.ListCtrl,
-			    listmix.ListCtrlAutoWidthMixin,
-			    listmix.TextEditMixin):
+class DescriptorDetailsList(treemixin.VirtualTree,
+			    treemixin.ExpansionState,
+			    wx.gizmos.TreeListCtrl):
 
-	def __init__(self, parent, ID, pos=wx.DefaultPosition, size=wx.DefaultSize, style=0):
-		wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
+	def __init__(self, *args, **kwargs):
+		kwargs['style'] = wx.TR_DEFAULT_STYLE | wx.TR_FULL_ROW_HIGHLIGHT
 
-		listmix.ListCtrlAutoWidthMixin.__init__(self)
+		super(DescriptorDetailsList, self).__init__(*args, **kwargs)
 
-		self.InsertColumn(0, "Name")
-		self.InsertColumn(1, "Value")
-		self.InsertColumn(2, "Type")
-		self.InsertColumn(3, "Comment")
-		self.InsertColumn(4, "Size")
+		self.AddColumn("Name", width=150)
+		self.AddColumn("Value", width=80, edit=True)
+		self.AddColumn("Type", width=100)
+		self.AddColumn("Comment", width=200)
+		self.AddColumn("Size")
 
-		self.SetColumnWidth(0, 100)
-		self.SetColumnWidth(1, 80)
-		self.SetColumnWidth(2, 100)
-		self.SetColumnWidth(3, 200)
-		self.SetColumnWidth(4, wx.LIST_AUTOSIZE)
-
-		listmix.TextEditMixin.__init__(self)
 		self.editedElement = None
 
-		#self.Bind(wx.EVT_LIST_ITEM_FOCUSED, self.OnItemActivated)
+		self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.OnBeginLabelEdit)
+		self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.OnEndLabelEdit)
 
-	def OnComboBoxLostFocus(self, event):
-		if (self.comboBox != None):
-			self.comboBox.Hide()
-		event.Skip()
+	def OnBeginLabelEdit(self, event):
+		index = self.GetIndexOfItem(event.GetItem())[0]
 
-	def OnEnumSelected(self, event):
-		selected = event.GetId()
-		e = self.editedElement
-		self.editedElement = None
-
-		e.value = e.enumVals[selected]
-		event.Skip()
-		self.UpdatePanel()
-
-	def SetStringItem(self, index, col, data):
-		e = self.editedElement
-
-		if (e and col == 1):
-			mask = (1 << (e.size * 8)) - 1
-			e.val = self.editedElement.convertToInt(data) & mask
-			data = str(e.val)
-
-		wx.ListCtrl.SetStringItem(self, index, col, data)
-
-	def OpenEditor(self, col, row):
-		e = self.descriptor.elements[row]
-		item = self.GetItem(row, col).GetId()
-		print "item %d, col %d row %d" % (item, col, row)
-
-		# only the "value" column is editable
-		if (col != 1):
-			return;
+		e = self.descriptor.elements[index]
+		#item = self.GetItem(row, col).GetId()
+		#print "item %d, col %d row %d" % (item, col, row)
 
 		if (e.elementType == e.ELEMENT_TYPE_VARIABLE):
-			listmix.TextEditMixin.OpenEditor(self, col, row)
 			self.editedElement = e
+			return
 
 		if (e.elementType == e.ELEMENT_TYPE_ENUM):
 			menu = wx.Menu()
+
+			print e
 
 			idx = 0
 			for k in e.enumKeys:
@@ -88,45 +60,99 @@ class DescriptorDetailsList(wx.ListCtrl,
 			menu.Bind(wx.EVT_MENU, self.OnEnumSelected)
 			self.PopupMenu(menu)
 
-	def SetDescriptor(self, descriptor):
-		self.descriptor = descriptor
-		self.UpdatePanel()
+		event.Veto()
 
-	def UpdatePanel(self):
-		self.DeleteAllItems()
+	def OnEndLabelEdit(self, event):
+		e = self.editedElement
 
-		descriptor = self.descriptor
+		if e:
+			mask = (1 << (e.size * 8)) - 1
+			e.value = e.convertToInt(event.GetLabel()) & mask
 
-		for e in descriptor.elements:
-			etype = "UNKNOWN"
+		self.RefreshItems()
+
+	def OnGetItemText(self, indices, column=0):
+		e = self.descriptor.elements[indices[0]]
+
+		if len(indices) == 2 and e.elementType == e.ELEMENT_TYPE_BITMAP:
+			e = e.bitmap[indices[1]]
+
+		if column == 0:
+			return e.name
+
+		if column == 1:
 			value = e.prettyPrint()
 
-			if (e.elementType == e.ELEMENT_TYPE_CONSTANT):
-				etype = "constant"
-			if (e.elementType == e.ELEMENT_TYPE_VARIABLE):
-				etype = "variable"
 			if (e.elementType == e.ELEMENT_TYPE_ENUM):
-				etype = "enumerated"
 				idx = 0
 				for v in e.enumVals:
 					if (e.convertToInt(e.value) == e.convertToInt(v)):
 						value = e.enumKeys[idx]
 
 					idx += 1
+			return value
 
-			if (e.elementType == e.ELEMENT_TYPE_AUTO):
+		if column == 2:
+			etype = "UNKNOWN"
+
+			if e.elementType == e.ELEMENT_TYPE_AUTO:
 				etype = "automatic"
-			if (e.elementType == e.ELEMENT_TYPE_LINK):
+			if e.elementType == e.ELEMENT_TYPE_LINK:
 				etype = "link"
+			if e.elementType == e.ELEMENT_TYPE_CONSTANT:
+				etype = "constant"
+			if e.elementType == e.ELEMENT_TYPE_VARIABLE:
+				etype = "variable"
+			if e.elementType == e.ELEMENT_TYPE_ENUM:
+				etype = "enumerated"
+			if e.elementType == e.ELEMENT_TYPE_BITMAP:
+				etype = "bitmap"
 
-			index = self.InsertStringItem(sys.maxint, "")
-			self.SetStringItem(index, 0, e.name)
-			self.SetStringItem(index, 1, value)
-			self.SetStringItem(index, 2, etype)
-			self.SetStringItem(index, 3, e.comment)
-			self.SetStringItem(index, 4, "%d" % e.size)
+			return etype
 
-		self.RefreshItems(0, len(descriptor.elements))
+		if column == 3:
+			return e.comment
+
+		if column == 4:
+			unit = "byte"
+			if len(indices) == 2:
+				unit = "bit"
+
+			multiple = ""
+			if (e.size != 1):
+				multiple = "s"
+
+			return "%d %s%s" % (e.size, unit, multiple)
+
+		return ""
+
+	def OnGetChildrenCount(self, indices):
+		if len(indices) == 0:
+			return len(self.descriptor.elements)
+
+		index = indices[0]
+		e = self.descriptor.elements[index]
+
+		if len(indices) == 1 and e.elementType == e.ELEMENT_TYPE_BITMAP:
+			return len(e.bitmap)
+
+		return 0
+
+	def OnGetItemTextColour(self, indices):
+		return wx.BLACK
+
+	def OnEnumSelected(self, event):
+		selected = event.GetId()
+		e = self.editedElement
+		self.editedElement = None
+
+		e.value = e.enumVals[selected]
+		event.Skip()
+		self.RefreshItems()
+
+	def SetDescriptor(self, descriptor):
+		self.descriptor = descriptor
+		self.RefreshItems()
 
 class DescriptorDetailsPanel(wx.Panel):
 	def __init__(self, parent):
