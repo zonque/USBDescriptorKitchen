@@ -43,8 +43,6 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		if (e.elementType == e.ELEMENT_TYPE_ENUM):
 			menu = wx.Menu()
 
-			print e
-
 			idx = 0
 			for k in e.enumKeys:
 				v = e.enumVals[idx]
@@ -143,7 +141,11 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 
 	def SetDescriptor(self, descriptor):
 		self.descriptor = descriptor
-		self.RefreshItems()
+
+		if descriptor:
+			self.RefreshItems()
+		else:
+			self.DeleteAllItems()
 
 class DescriptorDetailsPanel(wx.Panel):
 	def __init__(self, parent):

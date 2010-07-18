@@ -108,7 +108,14 @@ class DescriptorElementClass:
 
 		s = ""
 		first = 1
-		for i in range(self.size):
+		size = self.size
+
+		if self.parentElement and self.parentElement.elementType == self.ELEMENT_TYPE_BITMAP:
+			size /= 8
+			if (self.size % 8):
+				size += 1
+
+		for i in range(size):
 			if (first == 0):
 				s += ", "
 			s += "0x%02x" % ((value >> (i * 8)) & 0xff)

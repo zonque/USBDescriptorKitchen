@@ -2,6 +2,7 @@
 
 import wx
 import os
+import copy
 import string
 
 import StringListPanel
@@ -67,6 +68,8 @@ class MainFrame(wx.Frame):
 
 		self.CenterOnScreen()
 
+		self.templates = []
+
 		# Prepare the menu bar
 		menuBar = wx.MenuBar()
 
@@ -78,9 +81,23 @@ class MainFrame(wx.Frame):
 		menu1.Append(104, "&Quit", "")
 		menuBar.Append(menu1, "&File")
 
+		submenu = wx.Menu()
+		menuid = 1000
+
+		for (path, dirs, files) in os.walk("templates/"):
+			for f in files:
+				try:
+					desc = Template.parseTemplateFromFile(path + f)
+					submenu.Append(menuid, desc.descriptorType)
+					self.templates.append(desc)
+					self.Bind(wx.EVT_MENU, self.OnAddDescriptor, id=menuid)
+					menuid += 1
+				except:
+					continue
+
 		menu2 = wx.Menu()
-		menu2.Append(201, "&Add", "")
-		menu2.Append(202, "&Remove", "")
+		menu2.AppendMenu(201, "&Add", submenu)
+		menu2.Append(202, "&Remove selected", "")
 		menu2.AppendSeparator()
 		menu2.Append(203, "&Dump", "")
 		menuBar.Append(menu2, "&Descriptor set")
@@ -90,7 +107,7 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.OnOpen, id=101)
 		self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=104)
 
-		self.Bind(wx.EVT_MENU, self.OnAddDescriptor, id=201)
+		#self.Bind(wx.EVT_MENU, self.OnAddDescriptor)
 		self.Bind(wx.EVT_MENU, self.OnRemoveDescriptor, id=202)
 		self.Bind(wx.EVT_MENU, self.OnDump, id=203)
 
@@ -133,7 +150,8 @@ class MainFrame(wx.Frame):
 			print "};\n"
 
 	def OnAddDescriptor(self, event):
-		desc = Template.parseTemplateFromFile("templates/configuration.xml")
+		idx = event.GetId() - 1000
+		desc = copy.deepcopy(self.templates[idx])
 		self.tree.AddDescriptor(desc)
 
 	def OnRemoveDescriptor(self, event):

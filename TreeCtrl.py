@@ -11,7 +11,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 	def __init__(self, parent, descriptorDetailPanel,
 			 id=wx.ID_ANY, pos=wx.DefaultPosition,
 			 size=wx.DefaultSize,
-			 style=wx.SUNKEN_BORDER | CT.TR_HAS_BUTTONS | CT.TR_HAS_VARIABLE_ROW_HEIGHT | wx.WANTS_CHARS,
+			 style=wx.SUNKEN_BORDER | wx.WANTS_CHARS,
 			 log=None):
 
 		CT.CustomTreeCtrl.__init__(self, parent, id, pos, size, style)
@@ -48,10 +48,10 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 			else:
 				root = self.root
 
-			if self.selectedDescriptor:
-				parent = self.selectedDescriptor.children
-			else:
-				parent = self.descriptors
+		if self.selectedDescriptor:
+			parent = self.selectedDescriptor.children
+		else:
+			parent = self.descriptors
 
 		name = newdescriptor.descriptorType
 		if (newdescriptor.comment):
@@ -156,5 +156,17 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		if not self.selectedDescriptor:
 			return
 
-		print "bla"
+		p = self.item.GetParent()
+		pd = self.GetPyData(p)
+
+		if pd:
+			parent = pd.children
+		else:
+			parent = self.descriptors
+
+		parent.remove(self.selectedDescriptor)
+		self.Delete(self.item)
+		self.selectedDescriptor = None
+		self.item = None
+		self.descriptorDetailPanel.SetDescriptor(None)
 
