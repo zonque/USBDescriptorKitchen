@@ -35,8 +35,21 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
 		if selectedDescriptor:
 			parent = selectedDescriptor.children
+			parentType = selectedDescriptor.descriptorType
 		else:
 			parent = self.descriptors
+			parentType = "Root"
+
+		if not parentType in newdescriptor.allowedParents:
+			s = "Illegal parent \"%s\" for descriptor of type \"%s\". " % (parentType, newdescriptor.descriptorType)
+			s += "Allowed parent types are:\n\n"
+			for a in newdescriptor.allowedParents:
+				s += "\"" + a + "\"\n"
+
+			dlg = wx.MessageDialog(self, s, "Error adding descriptor", wx.OK | wx.ICON_ERROR)
+			dlg.ShowModal()
+			dlg.Destroy()
+			return False
 
 		newdescriptor.setParentList(parent)
 		item = self.AppendItem(root, newdescriptor.getSummaryName())
@@ -56,6 +69,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 			self.descriptorDetailPanel.RefreshItems()
 
 		self.UpdateSummaryNames()
+		return True
 
 	def BuildTree(self):
 		self.DeleteAllItems()
@@ -125,14 +139,14 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
 		newParentDescriptor = self.GetPyData(newroot)
 
-		if oldParentDescriptor:
-			oldParentDescriptor.children.remove(descriptor)
-		else:
-			self.descriptors.remove(descriptor)
+		if self.AddDescriptor(copy.deepcopy(descriptor), newroot):
+			if oldParentDescriptor:
+				oldParentDescriptor.children.remove(descriptor)
+			else:
+				self.descriptors.remove(descriptor)
 
-		self.Delete(self.item)
-		self.item = None
-		self.AddDescriptor(copy.deepcopy(descriptor), newroot)
+			self.Delete(self.item)
+			self.item = None
 
 		event.Skip()
 

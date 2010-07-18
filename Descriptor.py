@@ -171,6 +171,7 @@ class DescriptorClass:
 		self.children = []
 		self.descriptorType = descriptorType
 		self.comment = comment
+		self.allowedParents = []
 
 	def setParentList(self, pl):
 		self.parentList = pl

@@ -10,6 +10,7 @@ def createInterfaceClassCodes(name):
 
 def createDeviceDescriptorTemplate():
 	desc = DescriptorClass("DeviceDescriptor")
+	desc.allowedParents.append("Root")
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
 	elem.autoMethod = "descriptorSize"
@@ -67,6 +68,7 @@ def createDeviceDescriptorTemplate():
 
 def createConfigDescriptorTemplate():
 	desc = DescriptorClass("ConfigurationDescriptor")
+	desc.allowedParents.append("Root")
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
 	elem.autoMethod = "descriptorSize"
@@ -115,6 +117,7 @@ def createConfigDescriptorTemplate():
 
 def createStringDescriptorTemplate():
 	desc = DescriptorClass("StringDescriptor")
+	desc.allowedParents.append("Root")
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
 	elem.autoMethod = "descriptorSize"
@@ -131,6 +134,7 @@ def createStringDescriptorTemplate():
 
 def createInterfaceDescriptorTemplate():
 	desc = DescriptorClass("InterfaceDescriptor")
+	desc.allowedParents.append("ConfigurationDescriptor")
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
 	elem.autoMethod = "descriptorSize"
@@ -168,6 +172,7 @@ def createInterfaceDescriptorTemplate():
 
 def createEndpointDescriptorTemplate():
 	desc = DescriptorClass("EndpointDescriptor")
+	desc.allowedParents.append("InterfaceDescriptor")
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
 	elem.autoMethod = "descriptorSize"
@@ -210,6 +215,7 @@ def createEndpointDescriptorTemplate():
 
 def createDeviceQualifierTemplate():
 	desc = DescriptorClass("DeviceQualifier")
+	desc.allowedParents.append("Root")
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
 	elem.autoMethod = "descriptorSize"
@@ -250,6 +256,7 @@ def createDeviceQualifierTemplate():
 
 def createInterfaceAssociationDescriptorTemplate():
 	desc = DescriptorClass("InterfaceAssociationDescriptor")
+	desc.allowedParents.append("Root")
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
 	elem.autoMethod = "descriptorSize"
@@ -282,6 +289,7 @@ def createInterfaceAssociationDescriptorTemplate():
 
 def createDFUFunctionDescriptorTemplate():
 	desc = DescriptorClass("DFUFunctionalDescriptor")
+	desc.allowedParents.append("ConfigurationDescriptor")
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
 	elem.autoMethod = "descriptorSize"
@@ -291,7 +299,23 @@ def createDFUFunctionDescriptorTemplate():
 	elem.value = 0x21
 	desc.addElement(elem)
 
-	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bmAttributes")
+	elem = DescriptorElementClass(elementType = "bitmap", size = 1, name = "bmAttributes")
+	bitmap = DescriptorElementClass("enum", size = 1, name = "bitWillDetach")
+	bitmap.enum = { "No": 0, "Yes": 1 };
+	bitmap.offset = 3
+	elem.appendBitmap(bitmap)
+	bitmap = DescriptorElementClass("enum", size = 1, name = "bitManifestationTolerant")
+	bitmap.enum = { "No": 0, "Yes": 1 };
+	bitmap.offset = 2
+	elem.appendBitmap(bitmap)
+	bitmap = DescriptorElementClass("enum", size = 1, name = "bitCanUpload")
+	bitmap.enum = { "No": 0, "Yes": 1 };
+	bitmap.offset = 1
+	elem.appendBitmap(bitmap)
+	bitmap = DescriptorElementClass("enum", size = 1, name = "bitCanDnload")
+	bitmap.enum = { "No": 0, "Yes": 1 };
+	bitmap.offset = 0
+	elem.appendBitmap(bitmap)
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 2, name = "wDetachTimeOut")
@@ -315,6 +339,7 @@ def createTemplates():
 	templates.append(createEndpointDescriptorTemplate())
 	templates.append(createDeviceQualifierTemplate())
 	templates.append(createInterfaceAssociationDescriptorTemplate())
+	templates.append(createDFUFunctionDescriptorTemplate())
 
 	return templates
 
