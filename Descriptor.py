@@ -228,6 +228,9 @@ class DescriptorClass:
 	def getIndexFromParentList(self):
 		idx = 0
 		for d in self.parentList:
+			if d.descriptorType != self.descriptorType:
+				continue
+
 			if d == self:
 				return idx
 
@@ -266,13 +269,19 @@ class DescriptorClass:
 	def getSummaryName(self):
 		name = self.descriptorType
 
+		if name == "ConfigurationDescriptor":
+			for e in self.elements:
+				if e.name == "bConfigurationValue":
+					val = e.value
+			name += " (#%d)" % val
+
 		if name == "InterfaceDescriptor":
 			for e in self.elements:
 				if e.name == "bInterfaceNumber":
 					idx = e.value
 				if e.name == "bAlternateSetting":
 					alt = e.value
-			name += " (num %d, alt %d)" % (idx, alt)
+			name += " (#%d, alt %d)" % (idx, alt)
 
 		if name == "EndpointDescriptor":
 			for e in self.elements:
