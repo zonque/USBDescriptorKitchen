@@ -5,7 +5,6 @@ import os
 import copy
 import string
 
-import StringListPanel
 import Descriptor
 import TreeCtrl
 import DescriptorDetailsPanel
@@ -30,8 +29,6 @@ class MainWindow(wx.Panel):
 
 		tree = self.descriptorTree
 
-		#tree.BuildTree()
-
 		parent.setTree(tree)
 
 class MainFrame(wx.Frame):
@@ -42,9 +39,7 @@ class MainFrame(wx.Frame):
 
 		self.templates = []
 
-		# Prepare the menu bar
 		menuBar = wx.MenuBar()
-
 		menu1 = wx.Menu()
 		menu1.Append(101, "&Open", "")
 		menu1.Append(102, "&Save", "")
@@ -74,7 +69,6 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.OnOpen, id=101)
 		self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=104)
 
-		#self.Bind(wx.EVT_MENU, self.OnAddDescriptor)
 		self.Bind(wx.EVT_MENU, self.OnRemoveDescriptor, id=202)
 		self.Bind(wx.EVT_MENU, self.OnDump, id=203)
 

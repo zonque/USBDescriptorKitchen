@@ -1,10 +1,7 @@
 import wx
 import string
-import os
-import sys
 
 import wx.gizmos
-import wx.lib.mixins.listctrl  as  listmix
 from wx.lib.mixins import treemixin
 import Descriptor
 
@@ -43,16 +40,17 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		if e.elementType == "enum":
 			menu = wx.Menu()
 
-			idx = 0
-			for (k, v) in e.enum.items():
+			items = sorted(e.enum.iteritems(), key=lambda(k,v): (v,k))
+
+			for (k, v) in items:
 				if v != k:
 					title = "%s (%s)" % (k, e.dumpValueNoComma(e.convertToInt(v)))
 				else:
 					title = k
 
-				item = wx.MenuItem(menu, idx + 1, title)
+				# "+1" for OS X where zero values are not allowed
+				item = wx.MenuItem(menu, v + 1, title)
 				menu.AppendItem(item)
-				idx += 1
 
 			self.editedElement = e
 			menu.Bind(wx.EVT_MENU, self.OnEnumSelected)
@@ -131,7 +129,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		if not e:
 			return;
 
-		e.setValue(e.enum.values()[selected])
+		e.setValue(selected)
 		self.editedElement = None
 
 		event.Skip()

@@ -1,14 +1,10 @@
 import wx
-import string
-import os
 import copy
-import wx.lib.colourselect as csel
 import wx.lib.customtreectrl as CT
 import DescriptorDetailsPanel
 import Template
 
 class CustomTreeCtrl(CT.CustomTreeCtrl):
-
 	def __init__(self, parent, descriptorDetailPanel,
 			 id=wx.ID_ANY, pos=wx.DefaultPosition,
 			 size=wx.DefaultSize,
@@ -29,7 +25,6 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		descriptorDetailPanel.setDescriptorList(self)
 
 	def AddDescriptor(self, newdescriptor, root=None):
-
 		if not root:
 			if self.item:
 				root = self.item
@@ -85,27 +80,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
 			item = self.GetNext(item)
 
-	def BindEvents(self, choice, recreate=False):
-
-		value = choice.GetValue()
-		text = choice.GetLabel()
-
-		evt = "CT." + text
-		binder = self.eventdict[text]
-
-		if value == 1:
-			if evt == "CT.EVT_TREE_BEGIN_RDRAG":
-				self.Bind(wx.EVT_RIGHT_DOWN, None)
-				self.Bind(wx.EVT_RIGHT_UP, None)
-			self.Bind(eval(evt), binder)
-		else:
-			self.Bind(eval(evt), None)
-			if evt == "CT.EVT_TREE_BEGIN_RDRAG":
-				self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightDown)
-				self.Bind(wx.EVT_RIGHT_UP, self.OnRightUp)
-
 	def OnItemFont(self, event):
-
 		data = wx.FontData()
 		font = self.itemdict["font"]
 
@@ -125,7 +100,6 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
 
 	def OnSelChanged(self, event):
-
 		for d in self.descriptors:
 			d.handleAutoFields()
 
@@ -137,13 +111,11 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
 
 	def OnBeginDrag(self, event):
-
 		self.item = event.GetItem()
 		if self.item:
 			event.Allow()
 
 	def OnEndDrag(self, event):
-
 		newroot = event.GetItem()
 
 		descriptor = self.GetPyData(self.item)

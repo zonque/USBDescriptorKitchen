@@ -39,12 +39,9 @@ class DescriptorElementClass:
 		if not val:
 			val = self.value
 
-		idx = 0
 		for (k, v) in self.enum.items():
 			if self.convertToInt(self.value) == self.convertToInt(v):
 				value = k
-
-			idx += 1
 
 		return value
 
@@ -120,7 +117,7 @@ class DescriptorElementClass:
 		if self.comment != "":
 			print "(%s) " % self.comment ,
 
-		if self.elementType == "string":
+		if self.elementType == "enum":
 			print "(\"%s\") " % self.getEnumKey() ,
 
 		if self.elementType == "bitmap":
