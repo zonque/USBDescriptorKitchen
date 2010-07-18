@@ -123,13 +123,15 @@ class DescriptorElementClass:
 
 		return s
 
-	def dumpHex(self):
+	def dumpHex(self, indent=""):
 		s = ""
 		if self.elementType == self.ELEMENT_TYPE_STRING:
 			for i in range(len(self.strValue)):
 				# FIXME: this works for ASCII only
-				s += "0x%02x, " % ord(self.strValue[i])
-				s += "0x00, "
+				s += "0x%02x, 0x00, " % ord(self.strValue[i])
+				if (i % 8 == 7):
+					s += "\n"
+					s += indent + " "
 		else:
 			for i in range(self.size):
 				s += "0x%02x, " % ((self.value >> (i * 8)) & 0xff)
@@ -138,7 +140,7 @@ class DescriptorElementClass:
 
 	def dumpC(self, indent = ""):
 		print indent ,
-		dump = self.dumpHex()
+		dump = self.dumpHex(indent)
 		padding = ' ' * (30 - len(indent) - len(dump))
 		print "%s%s/* %s" % (dump, padding, self.name) ,
 
@@ -174,7 +176,7 @@ class DescriptorElementClass:
 
 		if self.elementType == self.ELEMENT_TYPE_STRING:
 			self.strValue = value
-			self.comment = "\"%s\"" % e.strValue
+			self.comment = "\"%s\"" % self.strValue
 			return
 
 		if p:
@@ -298,6 +300,13 @@ class DescriptorClass:
 				if e.name == "bEndpointAddress":
 					addr = e.value
 			name += " (0x%02x)" % addr
+		
+		if name == "StringDescriptor":
+			for e in self.elements:
+				if e.name == "bString":
+					v = e.strValue
+			
+			name += " (%s)" % v
 
 		return name
 

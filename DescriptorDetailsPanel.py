@@ -143,9 +143,6 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 
 		return wx.BLACK
 
-	def OnGetItemFont(self, indices):
-		return wx.SMALL_FONT
-
 	def OnEnumSelected(self, event):
 		selected = event.GetId() - 1
 		e = self.editedElement
