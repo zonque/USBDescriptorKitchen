@@ -3,16 +3,7 @@ class DescriptorLink:
 	descriptorField = ""
 
 class DescriptorElementClass:
-	ELEMENT_TYPE_UNKNOWN = 0
-	ELEMENT_TYPE_CONSTANT = 1
-	ELEMENT_TYPE_VARIABLE = 2
-	ELEMENT_TYPE_ENUM = 3
-	ELEMENT_TYPE_AUTO = 4
-	ELEMENT_TYPE_LINK = 5
-	ELEMENT_TYPE_BITMAP = 6
-	ELEMENT_TYPE_STRING = 7
-
-	def __init__(self, elementType = 0, size = 0, name = ""):
+	def __init__(self, elementType = "UNKNOWN", size = 0, name = ""):
 		self.elementType = elementType
 		self.size = size
 		self.name = name
@@ -30,10 +21,10 @@ class DescriptorElementClass:
 		self.parentElement = None
 
 	def convertToInt(self, data):
-		if (type(data) is int):
+		if type(data) is int:
 			return data
 
-		if (data[:2] == "0x"):
+		if data[:2] == "0x":
 			try:
 				return int(data, 16)
 			except:
@@ -50,7 +41,7 @@ class DescriptorElementClass:
 
 		idx = 0
 		for (k, v) in self.enum.items():
-			if (self.convertToInt(self.value) == self.convertToInt(v)):
+			if self.convertToInt(self.value) == self.convertToInt(v):
 				value = k
 
 			idx += 1
@@ -61,23 +52,23 @@ class DescriptorElementClass:
 		if not value:
 			value = self.value
 
-		if (self.elementType == self.ELEMENT_TYPE_STRING):
+		if self.elementType == "string":
 			return self.strValue
 
-		if self.elementType == self.ELEMENT_TYPE_ENUM:
+		if self.elementType == "enum":
 			return self.getEnumKey(self.value)
 
-		if (self.elementType == self.ELEMENT_TYPE_BITMAP):
+		if self.elementType == "bitmap":
 			self.displayFormat = "hex"
 
-		if (self.displayFormat == "hex"):
-			if (self.size == 1):
+		if self.displayFormat == "hex":
+			if self.size == 1:
 				s = "0x%02x" % value
-			if (self.size == 2):
+			if self.size == 2:
 				s = "0x%04x" % value
-			if (self.size == 3):
+			if self.size == 3:
 				s = "0x%06x" % value
-			if (self.size == 4):
+			if self.size == 4:
 				s = "0x%08x" % value
 		else:
 			s = "%d" % self.convertToInt(str(value))
@@ -92,13 +83,13 @@ class DescriptorElementClass:
 		first = 1
 		size = self.size
 
-		if self.parentElement and self.parentElement.elementType == self.ELEMENT_TYPE_BITMAP:
+		if self.parentElement and self.parentElement.elementType == "bitmap":
 			size /= 8
-			if (self.size % 8):
+			if self.size % 8:
 				size += 1
 
 		for i in range(size):
-			if (first == 0):
+			if first == 0:
 				s += ", "
 			s += "0x%02x" % ((value >> (i * 8)) & 0xff)
 			first = 0
@@ -107,11 +98,11 @@ class DescriptorElementClass:
 
 	def dumpHex(self, indent=""):
 		s = ""
-		if self.elementType == self.ELEMENT_TYPE_STRING:
+		if self.elementType == "string":
 			for i in range(len(self.strValue)):
 				# FIXME: this works for ASCII only
 				s += "0x%02x, 0x00, " % ord(self.strValue[i])
-				if (i % 8 == 7):
+				if i % 8 == 7:
 					s += "\n"
 					s += indent + " "
 		else:
@@ -126,13 +117,13 @@ class DescriptorElementClass:
 		padding = ' ' * (30 - len(indent) - len(dump))
 		print "%s%s/* %s" % (dump, padding, self.name) ,
 
-		if (self.comment != ""):
+		if self.comment != "":
 			print "(%s) " % self.comment ,
 
-		if (self.elementType == self.ELEMENT_TYPE_ENUM):
+		if self.elementType == "string":
 			print "(\"%s\") " % self.getEnumKey() ,
 
-		if (self.elementType == self.ELEMENT_TYPE_BITMAP):
+		if self.elementType == "bitmap":
 			print "(" ,
 			first = 1
 			for b in self.bitmap:
@@ -148,7 +139,7 @@ class DescriptorElementClass:
 		print "*/"
 
 	def updateSize(self):
-		if self.elementType == self.ELEMENT_TYPE_STRING:
+		if self.elementType == "string":
 			try:
 				self.size = len(self.strValue) * 2 # UNICODE
 			except:
@@ -156,14 +147,13 @@ class DescriptorElementClass:
 	def setValue(self, value):
 		p = self.parentElement
 
-		if self.elementType == self.ELEMENT_TYPE_STRING:
+		if self.elementType == "string":
 			self.strValue = value
 			self.comment = "\"%s\"" % self.strValue
 			return
 
 		if p:
-			# handle bitmap elements
-			if p.elementType == self.ELEMENT_TYPE_BITMAP:
+			if p.elementType == "bitmap":
 				mask = (1 << self.size) - 1
 				self.value = self.convertToInt(value)
 				v = p.value
@@ -215,7 +205,7 @@ class DescriptorClass:
 		count = 0
 
 		for c in self.children:
-			if (c.descriptorType == cType):
+			if c.descriptorType == cType:
 				count += 1
 
 		return count
@@ -240,24 +230,24 @@ class DescriptorClass:
 			idx += 1
 
 		for e in self.elements:
-			if (e.elementType != e.ELEMENT_TYPE_AUTO):
+			if e.elementType != "auto":
 				continue
 
-			if (e.autoMethod == "descriptorSize"):
+			if e.autoMethod == "descriptorSize":
 				e.value = self.countSize()
 
-			if (e.autoMethod == "descriptorSizeAllChildren"):
+			if e.autoMethod == "descriptorSizeAllChildren":
 				e.value = self.countAllSize()
 
-			if (e.autoMethod == "countChildrenOfType"):
+			if e.autoMethod == "countChildrenOfType":
 				e.value = self.countChildrenOfType(e.autoMethodDetail)
 
-			if (e.autoMethod == "indexOfDescriptor"):
+			if e.autoMethod == "indexOfDescriptor":
 				e.value = self.getIndexFromParentList() + e.base
 
 	def getValue(self, field):
 		for e in self.elements:
-			if (e.name == field):
+			if e.name == field:
 				return e.value
 		return -1
 
@@ -300,7 +290,7 @@ class DescriptorClass:
 
 		print indent ,
 		print "/* %s" % self.descriptorType ,
-		if (self.comment != ""):
+		if self.comment != "":
 			print " (%s)" % self.comment,
 		print "*/"
 
@@ -315,7 +305,7 @@ class DescriptorClass:
 
 		for p in possibleDescriptors:
 			for c in self.children:
-				if (c.descriptorType == p.descriptorType):
+				if c.descriptorType == p.descriptorType:
 					a.append({'descriptorID': c.getValue(p.descriptorField),
 						  'descriptorName': c.comment,
 						  'descriptorType': c.descriptorType})

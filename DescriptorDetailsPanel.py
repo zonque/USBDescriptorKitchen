@@ -35,17 +35,17 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		if len(indices) == 2:
 			e = e.bitmap[indices[1]]
 
-		if (e.elementType == e.ELEMENT_TYPE_VARIABLE or
-		    e.elementType == e.ELEMENT_TYPE_STRING):
+		if (e.elementType == "variable" or
+		    e.elementType == "string"):
 			self.editedElement = e
 			return
 
-		if (e.elementType == e.ELEMENT_TYPE_ENUM):
+		if e.elementType == "enum":
 			menu = wx.Menu()
 
 			idx = 0
 			for (k, v) in e.enum.items():
-				if (v != k):
+				if v != k:
 					title = "%s (%s)" % (k, e.dumpValueNoComma(e.convertToInt(v)))
 				else:
 					title = k
@@ -70,7 +70,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 	def OnGetItemText(self, indices, column=0):
 		e = self.descriptor.elements[indices[0]]
 
-		if len(indices) == 2 and e.elementType == e.ELEMENT_TYPE_BITMAP:
+		if len(indices) == 2 and e.elementType == "bitmap":
 			e = e.bitmap[indices[1]]
 
 		if column == 0:
@@ -80,24 +80,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 			return e.prettyPrint()
 
 		if column == 2:
-			etype = "UNKNOWN"
-
-			if e.elementType == e.ELEMENT_TYPE_AUTO:
-				etype = "automatic"
-			if e.elementType == e.ELEMENT_TYPE_LINK:
-				etype = "link"
-			if e.elementType == e.ELEMENT_TYPE_CONSTANT:
-				etype = "constant"
-			if e.elementType == e.ELEMENT_TYPE_VARIABLE:
-				etype = "variable"
-			if e.elementType == e.ELEMENT_TYPE_ENUM:
-				etype = "enumerated"
-			if e.elementType == e.ELEMENT_TYPE_BITMAP:
-				etype = "bitmap"
-			if e.elementType == e.ELEMENT_TYPE_STRING:
-				etype = "string"
-
-			return etype
+			return e.elementType
 
 		if column == 3:
 			return e.comment
@@ -108,7 +91,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 				unit = "bit"
 
 			multiple = ""
-			if (e.size != 1):
+			if e.size != 1:
 				multiple = "s"
 
 			return "%d %s%s" % (e.size, unit, multiple)
@@ -122,7 +105,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		index = indices[0]
 		e = self.descriptor.elements[index]
 
-		if len(indices) == 1 and e.elementType == e.ELEMENT_TYPE_BITMAP:
+		if len(indices) == 1 and e.elementType == "bitmap":
 			return len(e.bitmap)
 
 		return 0
@@ -130,14 +113,14 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 	def OnGetItemTextColour(self, indices):
 		e = self.descriptor.elements[indices[0]]
 
-		if len(indices) == 2 and e.elementType == e.ELEMENT_TYPE_BITMAP:
+		if len(indices) == 2 and e.elementType == "bitmap":
 			e = e.bitmap[indices[1]]
 
-		if e.elementType == e.ELEMENT_TYPE_VARIABLE:
+		if e.elementType == "variable":
 			return wx.RED
 
-		if (e.elementType == e.ELEMENT_TYPE_ENUM) or \
-		   (e.elementType == e.ELEMENT_TYPE_LINK):
+		if (e.elementType == "enum" or
+		    e.elementType == "link"):
 			return wx.BLUE
 
 		return wx.BLACK
