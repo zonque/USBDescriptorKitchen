@@ -11,7 +11,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 	def __init__(self, parent, descriptorDetailPanel,
 			 id=wx.ID_ANY, pos=wx.DefaultPosition,
 			 size=wx.DefaultSize,
-			 style=wx.SUNKEN_BORDER | wx.WANTS_CHARS,
+			 style=wx.SUNKEN_BORDER | CT.TR_HAS_BUTTONS | CT.TR_HAS_VARIABLE_ROW_HEIGHT | wx.WANTS_CHARS,
 			 log=None):
 
 		CT.CustomTreeCtrl.__init__(self, parent, id, pos, size, style)
@@ -31,7 +31,6 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		self.item = None
 		self.descriptorDetailPanel = descriptorDetailPanel
 		self.descriptors = []
-		self.selectedDescriptor = None
 
 		self.count = 0
 		self.log = log
@@ -39,6 +38,8 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		self.BuildTree()
 
 		self.Bind(CT.EVT_TREE_SEL_CHANGED, self.OnSelChanged)
+		self.Bind(CT.EVT_TREE_BEGIN_DRAG, self.OnBeginDrag)
+		self.Bind(CT.EVT_TREE_END_DRAG, self.OnEndDrag)
 
 	def AddDescriptor(self, newdescriptor, root=None):
 
@@ -48,8 +49,10 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 			else:
 				root = self.root
 
-		if self.selectedDescriptor:
-			parent = self.selectedDescriptor.children
+		selectedDescriptor = self.GetPyData(root)
+
+		if selectedDescriptor:
+			parent = selectedDescriptor.children
 		else:
 			parent = self.descriptors
 
@@ -68,14 +71,16 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
 		parent.append(newdescriptor)
 
-		if self.selectedDescriptor:
-			self.selectedDescriptor.handleAutoFields()
+		if selectedDescriptor:
+			selectedDescriptor.handleAutoFields()
 			self.descriptorDetailPanel.RefreshItems()
 
 	def BuildTree(self):
 		self.DeleteAllItems()
 		self.root = self.AddRoot("Root")
 		self.SetItemTextColour(self.root, wx.BLACK)
+
+		#self.SetPyData(self.root, { "children": []})
 
 		for d in self.descriptors:
 			self.AddDescriptor(d, self.root)
@@ -130,8 +135,6 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		d = self.GetPyData(self.item)
 		self.descriptorDetailPanel.SetDescriptor(d)
 
-		self.selectedDescriptor = d
-
 		event.Skip()
 
 
@@ -139,22 +142,42 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
 		self.item = event.GetItem()
 		if self.item:
-			self.log.write("Beginning Drag..." + "\n")
-
 			event.Allow()
-
 
 	def OnEndDrag(self, event):
 
-		self.item = event.GetItem()
-		if self.item:
-			self.log.write("Ending Drag!" + "\n")
+		newroot = event.GetItem()
+
+		descriptor = self.GetPyData(self.item)
+
+		oldParent = self.item.GetParent()
+		oldParentDescriptor = self.GetPyData(oldParent)
+
+		newParentDescriptor = self.GetPyData(newroot)
+
+		self.Delete(self.item)
+		item = self.AppendItem(newroot, descriptor.descriptorType)
+		self.SetPyData(item, descriptor)
+		self.SetItemTextColour(item, wx.BLACK)
+		self.Expand(newroot)
+
+		if oldParentDescriptor:
+			oldParentDescriptor.children.remove(descriptor)
+		else:
+			self.descriptors.remove(descriptor)
+
+		if newParentDescriptor:
+			newParentDescriptor.children.append(descriptor)
+		else:
+			self.descriptors.append(descriptor)
 
 		event.Skip()
 
 	def RemoveSelectedDescriptor(self):
-		if not self.selectedDescriptor:
+		if not self.item:
 			return
+
+		selectedDescriptor = self.GetPyData(self.item)
 
 		p = self.item.GetParent()
 		pd = self.GetPyData(p)
@@ -164,9 +187,8 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		else:
 			parent = self.descriptors
 
-		parent.remove(self.selectedDescriptor)
+		parent.remove(selectedDescriptor)
 		self.Delete(self.item)
-		self.selectedDescriptor = None
 		self.item = None
 		self.descriptorDetailPanel.SetDescriptor(None)
 
