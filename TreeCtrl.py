@@ -51,6 +51,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		self.Expand(item)
 
 		for c in newdescriptor.children:
+			print "child ..."
 			self.AddDescriptor(c, item)
 
 		parent.append(newdescriptor)
@@ -152,14 +153,14 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
 		newParentDescriptor = self.GetPyData(newroot)
 
-		self.Delete(self.item)
-
-		self.AddDescriptor(copy.deepcopy(descriptor), newroot)
-
 		if oldParentDescriptor:
 			oldParentDescriptor.children.remove(descriptor)
 		else:
 			self.descriptors.remove(descriptor)
+
+		self.Delete(self.item)
+		self.item = None
+		self.AddDescriptor(copy.deepcopy(descriptor), newroot)
 
 		event.Skip()
 

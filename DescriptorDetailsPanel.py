@@ -129,6 +129,18 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		return 0
 
 	def OnGetItemTextColour(self, indices):
+		e = self.descriptor.elements[indices[0]]
+
+		if len(indices) == 2 and e.elementType == e.ELEMENT_TYPE_BITMAP:
+			e = e.bitmap[indices[1]]
+
+		if e.elementType == e.ELEMENT_TYPE_VARIABLE:
+			return wx.RED
+
+		if (e.elementType == e.ELEMENT_TYPE_ENUM) or \
+		   (e.elementType == e.ELEMENT_TYPE_LINK):
+			return wx.BLUE
+
 		return wx.BLACK
 
 	def OnEnumSelected(self, event):

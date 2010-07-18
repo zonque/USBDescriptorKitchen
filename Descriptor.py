@@ -148,6 +148,16 @@ class DescriptorElementClass:
 		if (self.elementType == self.ELEMENT_TYPE_ENUM):
 			print "(\"%s\") " % self.getEnumKey() ,
 
+		if (self.elementType == self.ELEMENT_TYPE_BITMAP):
+			print "(" ,
+			first = 1
+			for b in self.bitmap:
+				if not first:
+					print ", " ,
+				first = 0
+				print "'%s' = %d" % (b.name, b.value) ,
+			print ")" ,
+
 		if self.size > 1:
 			print "(%d) " % self.value ,
 
