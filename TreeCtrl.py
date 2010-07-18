@@ -73,7 +73,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
 	def getStringDescriptors(self):
 		l = {}
-		idx = 0
+		idx = 1
 		for d in self.descriptors:
 			if d.descriptorType == "StringDescriptor":
 				s = d.getValue("bString")
@@ -177,6 +177,12 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
 		parent.remove(selectedDescriptor)
 		self.Delete(self.item)
+		self.item = None
+		self.descriptorDetailPanel.SetDescriptor(None)
+
+	def RemoveAllDescriptors(self):
+		self.descriptors = []
+		self.BuildTree()
 		self.item = None
 		self.descriptorDetailPanel.SetDescriptor(None)
 

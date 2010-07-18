@@ -15,7 +15,6 @@ class DescriptorElementClass:
 		self.base = 0
 		self.enum = {}
 		self.bitmap = []
-		self.possibleLinkedDescriptors = []
 		self.autoMethod = ""
 		self.autoMethodDetail = 0
 		self.parentElement = None
@@ -304,16 +303,4 @@ class DescriptorClass:
 
 		for c in self.children:
 			c.dumpC(indent)
-
-	def findDescriptorLinks(self, possibleDescriptors):
-		a = []
-
-		for p in possibleDescriptors:
-			for c in self.children:
-				if c.descriptorType == p.descriptorType:
-					a.append({'descriptorID': c.getValue(p.descriptorField),
-						  'descriptorName': c.comment,
-						  'descriptorType': c.descriptorType})
-
-		return a
 

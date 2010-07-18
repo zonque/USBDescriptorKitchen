@@ -15,8 +15,8 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		super(DescriptorDetailsList, self).__init__(*args, **kwargs)
 
 		self.AddColumn("Name", width=150)
-		self.AddColumn("Value", width=80, edit=True)
-		self.AddColumn("Type", width=100)
+		self.AddColumn("Value", width=150, edit=True)
+		self.AddColumn("Type", width=50)
 		self.AddColumn("Comment", width=200)
 		self.AddColumn("Size")
 

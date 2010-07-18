@@ -62,6 +62,8 @@ class MainFrame(wx.Frame):
 		menu2.Append(202, "&Remove selected", "")
 		menu2.AppendSeparator()
 		menu2.Append(203, "&Dump", "")
+		menu2.AppendSeparator()
+		menu2.Append(204, "&Clear", "")
 		menuBar.Append(menu2, "&Descriptor set")
 
 		self.SetMenuBar(menuBar)
@@ -71,6 +73,7 @@ class MainFrame(wx.Frame):
 
 		self.Bind(wx.EVT_MENU, self.OnRemoveDescriptor, id=202)
 		self.Bind(wx.EVT_MENU, self.OnDump, id=203)
+		self.Bind(wx.EVT_MENU, self.OnClearDescriptors, id=204)
 
 	def OnCloseWindow(self, event):
 		self.Close()
@@ -117,6 +120,9 @@ class MainFrame(wx.Frame):
 
 	def OnRemoveDescriptor(self, event):
 		self.tree.RemoveSelectedDescriptor()
+
+	def OnClearDescriptors(self, event):
+		self.tree.RemoveAllDescriptors()
 
 	def setTree(self, tree):
 		self.tree = tree
