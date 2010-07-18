@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<descriptor type="StringDescriptor">
-	<element type="auto" size="1" name="bLength" method="descriptorSize" />
-	<element type="constant" size="1" name="bDescriptorType" value="3" />
-	<element type="string" name="bString" />
-</descriptor>

@@ -12,12 +12,12 @@ class DescriptorElementClass:
 	ELEMENT_TYPE_BITMAP = 6
 	ELEMENT_TYPE_STRING = 7
 
-	def __init__(self):
-		self.elementType = self.ELEMENT_TYPE_UNKNOWN
+	def __init__(self, elementType = 0, size = 0, name = ""):
+		self.elementType = elementType
+		self.size = size
+		self.name = name
 		self.displayFormat = "dec"
-		self.name = ""
 		self.comment = ""
-		self.size = 0
 		self.value = 0
 		self.strValue = ""
 		self.displayValue = ""
@@ -72,6 +72,8 @@ class DescriptorElementClass:
 
 			idx += 1
 
+		print "getEnumKey for %s" % self.name
+
 		return value
 
 	def prettyPrint(self, value = None):
@@ -100,7 +102,6 @@ class DescriptorElementClass:
 			s = "%d" % self.convertToInt(str(value))
 
 		return s
-
 
 	def dumpValueNoComma(self, value = None):
 		if not value:
@@ -192,14 +193,16 @@ class DescriptorElementClass:
 			mask = (1 << (self.size * 8)) - 1
 			self.value = self.convertToInt(value) & mask
 
+	def appendBitmap(self, bitmap):
+		bitmap.parentElement = self
+		self.bitmap.append(bitmap)
 
 class DescriptorClass:
-	comment = ""
-	descriptorType = ""
-
-	def __init__(self):
+	def __init__(self, descriptorType = "", comment = ""):
 		self.elements = []
 		self.children = []
+		self.descriptorType = descriptorType
+		self.comment = comment
 
 	def setParentList(self, pl):
 		self.parentList = pl

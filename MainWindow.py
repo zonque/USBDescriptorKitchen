@@ -9,7 +9,7 @@ import StringListPanel
 import Descriptor
 import TreeCtrl
 import DescriptorDetailsPanel
-import Template
+import Templates
 
 class MainWindow(wx.Panel):
 
@@ -28,35 +28,7 @@ class MainWindow(wx.Panel):
 		sizer.Add(splitter, 1, wx.EXPAND)
 		self.SetSizer(sizer)
 
-
 		tree = self.descriptorTree
-
-		deviceDescriptor = Template.parseTemplateFromFile("templates/device.xml")
-		#tree.descriptors.append(deviceDescriptor)
-
-
-		configDescriptor = Template.parseTemplateFromFile("templates/configuration.xml")
-		i = Template.parseTemplateFromFile("templates/interface.xml")
-		ep = Template.parseTemplateFromFile("templates/endpoint.xml")
-
-		assoc = Template.parseTemplateFromFile("templates/interfaceassociation.xml")
-		i.addChild(assoc)
-
-		i.addChild(ep)
-		i.addChild(ep)
-		configDescriptor.addChild(i)
-		configDescriptor.addChild(i)
-		#tree.descriptors.append(configDescriptor)
-
-
-		configDescriptor = Template.parseTemplateFromFile("templates/configuration.xml")
-		#tree.descriptors.append(configDescriptor)
-
-		qual = Template.parseTemplateFromFile("templates/devicequalifier.xml")
-		#tree.descriptors.append(qual)
-
-		string = Template.parseTemplateFromFile("templates/string.xml")
-		#tree.descriptors.append(string)
 
 		#tree.BuildTree()
 
@@ -84,16 +56,11 @@ class MainFrame(wx.Frame):
 		submenu = wx.Menu()
 		menuid = 1000
 
-		for (path, dirs, files) in os.walk("templates/"):
-			for f in files:
-				try:
-					desc = Template.parseTemplateFromFile(path + f)
-					submenu.Append(menuid, desc.descriptorType)
-					self.templates.append(desc)
-					self.Bind(wx.EVT_MENU, self.OnAddDescriptor, id=menuid)
-					menuid += 1
-				except:
-					continue
+		self.templates = Templates.createTemplates()
+		for t in self.templates:
+			submenu.Append(menuid, t.descriptorType)
+			self.Bind(wx.EVT_MENU, self.OnAddDescriptor, id=menuid)
+			menuid += 1
 
 		menu2 = wx.Menu()
 		menu2.AppendMenu(201, "&Add", submenu)
