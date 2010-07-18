@@ -71,6 +71,17 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		self.UpdateSummaryNames()
 		return True
 
+	def getStringDescriptors(self):
+		l = {}
+		idx = 0
+		for d in self.descriptors:
+			if d.descriptorType == "StringDescriptor":
+				s = d.getValue("bString")
+				l[s] = idx
+				idx += 1
+
+		return l
+
 	def BuildTree(self):
 		self.DeleteAllItems()
 		self.root = self.AddRoot("Root")

@@ -45,6 +45,12 @@ class DescriptorElementClass:
 
 		return value
 
+	def getValue(self):
+		if self.elementType == "string":
+			return self.strValue
+		else:
+			return self.value
+
 	def prettyPrint(self, value = None):
 		if not value:
 			value = self.value
@@ -141,6 +147,7 @@ class DescriptorElementClass:
 				self.size = len(self.strValue) * 2 # UNICODE
 			except:
 				self.size = 0
+
 	def setValue(self, value):
 		p = self.parentElement
 
@@ -246,7 +253,7 @@ class DescriptorClass:
 	def getValue(self, field):
 		for e in self.elements:
 			if e.name == field:
-				return e.value
+				return e.getValue()
 		return -1
 
 	def getSummaryName(self):
