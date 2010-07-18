@@ -1,6 +1,7 @@
 import wx
 import string
 import os
+import copy
 import wx.lib.colourselect as csel
 import wx.lib.customtreectrl as CT
 import DescriptorDetailsPanel
@@ -11,35 +12,21 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 	def __init__(self, parent, descriptorDetailPanel,
 			 id=wx.ID_ANY, pos=wx.DefaultPosition,
 			 size=wx.DefaultSize,
-			 style=wx.SUNKEN_BORDER | CT.TR_HAS_BUTTONS | CT.TR_HAS_VARIABLE_ROW_HEIGHT | wx.WANTS_CHARS,
-			 log=None):
+			 style=wx.SUNKEN_BORDER | CT.TR_HAS_BUTTONS | CT.TR_HAS_VARIABLE_ROW_HEIGHT | wx.WANTS_CHARS):
 
 		CT.CustomTreeCtrl.__init__(self, parent, id, pos, size, style)
 
-		alldata = dir(CT)
-
-		treestyles = []
-		events = []
-		for data in alldata:
-			if data.startswith("TR_"):
-				treestyles.append(data)
-			elif data.startswith("EVT_"):
-				events.append(data)
-
-		self.events = events
-		self.styles = treestyles
 		self.item = None
 		self.descriptorDetailPanel = descriptorDetailPanel
 		self.descriptors = []
-
-		self.count = 0
-		self.log = log
 
 		self.BuildTree()
 
 		self.Bind(CT.EVT_TREE_SEL_CHANGED, self.OnSelChanged)
 		self.Bind(CT.EVT_TREE_BEGIN_DRAG, self.OnBeginDrag)
 		self.Bind(CT.EVT_TREE_END_DRAG, self.OnEndDrag)
+
+		descriptorDetailPanel.setDescriptorList(self)
 
 	def AddDescriptor(self, newdescriptor, root=None):
 
@@ -56,11 +43,8 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		else:
 			parent = self.descriptors
 
-		name = newdescriptor.descriptorType
-		if (newdescriptor.comment):
-			name += " (%s)" % newdescriptor.comment
-
-		item = self.AppendItem(root, name)
+		newdescriptor.setParentList(parent)
+		item = self.AppendItem(root, newdescriptor.getSummaryName())
 		self.SetPyData(item, newdescriptor)
 		self.SetItemTextColour(item, wx.BLACK)
 		self.Expand(root)
@@ -75,17 +59,30 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 			selectedDescriptor.handleAutoFields()
 			self.descriptorDetailPanel.RefreshItems()
 
+		self.UpdateSummaryNames()
+
 	def BuildTree(self):
 		self.DeleteAllItems()
 		self.root = self.AddRoot("Root")
 		self.SetItemTextColour(self.root, wx.BLACK)
 
-		#self.SetPyData(self.root, { "children": []})
-
 		for d in self.descriptors:
 			self.AddDescriptor(d, self.root)
 
 		self.Expand(self.root)
+
+	def UpdateSummaryNames(self):
+		item = self.GetRootItem()
+
+		while item:
+			desc = self.GetPyData(item)
+
+			if desc:
+				desc.handleAutoFields()
+				name = desc.getSummaryName()
+				self.SetItemText(item, name)
+
+			item = self.GetNext(item)
 
 	def BindEvents(self, choice, recreate=False):
 
@@ -156,20 +153,13 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		newParentDescriptor = self.GetPyData(newroot)
 
 		self.Delete(self.item)
-		item = self.AppendItem(newroot, descriptor.descriptorType)
-		self.SetPyData(item, descriptor)
-		self.SetItemTextColour(item, wx.BLACK)
-		self.Expand(newroot)
+
+		self.AddDescriptor(copy.deepcopy(descriptor), newroot)
 
 		if oldParentDescriptor:
 			oldParentDescriptor.children.remove(descriptor)
 		else:
 			self.descriptors.remove(descriptor)
-
-		if newParentDescriptor:
-			newParentDescriptor.children.append(descriptor)
-		else:
-			self.descriptors.append(descriptor)
 
 		event.Skip()
 

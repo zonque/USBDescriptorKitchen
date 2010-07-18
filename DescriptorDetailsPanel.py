@@ -66,6 +66,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		e.setValue(event.GetLabel())
 		self.descriptor.handleAutoFields()
 		self.RefreshItems()
+		self.descriptorList.UpdateSummaryNames()
 
 	def OnGetItemText(self, indices, column=0):
 		e = self.descriptor.elements[indices[0]]
@@ -138,6 +139,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 
 		event.Skip()
 		self.RefreshItems()
+		self.descriptorList.UpdateSummaryNames()
 
 	def SetDescriptor(self, descriptor):
 		self.descriptor = descriptor
@@ -146,6 +148,9 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 			self.RefreshItems()
 		else:
 			self.DeleteAllItems()
+
+	def setDescriptorList(self, l):
+		self.descriptorList = l
 
 class DescriptorDetailsPanel(wx.Panel):
 	def __init__(self, parent):
@@ -175,4 +180,7 @@ class DescriptorDetailsPanel(wx.Panel):
 
 	def RefreshItems(self):
 		self.detailsList.RefreshItems()
+
+	def setDescriptorList(self, l):
+		self.detailsList.setDescriptorList(l)
 

@@ -188,7 +188,9 @@ class DescriptorClass:
 	def __init__(self):
 		self.elements = []
 		self.children = []
-		self.indexOfDescriptor = 0
+
+	def setParentList(self, pl):
+		self.parentList = pl
 
 	def countSize(self):
 		size = 0
@@ -223,10 +225,19 @@ class DescriptorClass:
 
 		return count
 
+	def getIndexFromParentList(self):
+		idx = 0
+		for d in self.parentList:
+			if d == self:
+				return idx
+
+			idx += 1
+
+		return -1
+
 	def handleAutoFields(self):
 		idx = 0
 		for c in self.children:
-			c.indexOfDescriptor = idx
 			c.handleAutoFields()
 			idx += 1
 
@@ -244,13 +255,32 @@ class DescriptorClass:
 				e.value = self.countChildrenOfType(e.autoMethodDetail)
 
 			if (e.autoMethod == "indexOfDescriptor"):
-				e.value = self.indexOfDescriptor + e.base
+				e.value = self.getIndexFromParentList() + e.base
 
 	def getValue(self, field):
 		for e in self.elements:
 			if (e.name == field):
 				return e.value
 		return -1
+
+	def getSummaryName(self):
+		name = self.descriptorType
+
+		if name == "InterfaceDescriptor":
+			for e in self.elements:
+				if e.name == "bInterfaceNumber":
+					idx = e.value
+				if e.name == "bAlternateSetting":
+					alt = e.value
+			name += " (num %d, alt %d)" % (idx, alt)
+
+		if name == "EndpointDescriptor":
+			for e in self.elements:
+				if e.name == "bEndpointAddress":
+					addr = e.value
+			name += " (0x%02x)" % addr
+
+		return name
 
 	def dumpC(self, indent = ""):
 		self.handleAutoFields()
