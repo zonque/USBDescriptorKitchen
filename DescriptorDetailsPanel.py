@@ -44,8 +44,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 			menu = wx.Menu()
 
 			idx = 0
-			for k in e.enumKeys:
-				v = e.enumVals[idx]
+			for (k, v) in e.enum.items():
 				if (v != k):
 					title = "%s (%s)" % (k, e.dumpValueNoComma(e.convertToInt(v)))
 				else:
@@ -149,7 +148,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		if not e:
 			return;
 
-		e.setValue(e.enumVals[selected])
+		e.setValue(e.enum.values()[selected])
 		self.editedElement = None
 
 		event.Skip()

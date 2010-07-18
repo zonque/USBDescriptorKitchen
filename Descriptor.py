@@ -22,8 +22,7 @@ class DescriptorElementClass:
 		self.strValue = ""
 		self.displayValue = ""
 		self.base = 0
-		self.enumVals = []
-		self.enumKeys = []
+		self.enum = {}
 		self.bitmap = []
 		self.possibleLinkedDescriptors = []
 		self.autoMethod = ""
@@ -45,34 +44,16 @@ class DescriptorElementClass:
 		except:
 			return 0
 
-	def checkIntegrity(self):
-		if (self.name == ""):
-			print "DEBUG: self.name is not set."
-			return
-
-		if (self.elementType == self.ELEMENT_TYPE_UNKNOWN):
-			print "DEBUG: %s: elementType is not set." % self.name
-
-		if (self.elementType == self.ELEMENT_TYPE_AUTO and
-		    self.autoMethod == ""):
-			print "DEBUG %s: AUTO type requested but non set." % self.name
-
-		if (self.elementType == self.ELEMENT_TYPE_ENUM and
-		    len(self.enumVals) == 0):
-			print "DEBUG %s: no ENUMs given." % self.name
-
 	def getEnumKey(self, val = None):
 		if not val:
 			val = self.value
 
 		idx = 0
-		for v in self.enumVals:
+		for (k, v) in self.enum.items():
 			if (self.convertToInt(self.value) == self.convertToInt(v)):
-				value = self.enumKeys[idx]
+				value = k
 
 			idx += 1
-
-		print "getEnumKey for %s" % self.name
 
 		return value
 
@@ -212,7 +193,6 @@ class DescriptorClass:
 
 		for e in self.elements:
 			e.updateSize()
-			e.checkIntegrity()
 			size += e.size
 
 		return size
@@ -303,12 +283,12 @@ class DescriptorClass:
 				if e.name == "bEndpointAddress":
 					addr = e.value
 			name += " (0x%02x)" % addr
-		
+
 		if name == "StringDescriptor":
 			for e in self.elements:
 				if e.name == "bString":
 					v = e.strValue
-			
+
 			name += " (%s)" % v
 
 		return name
