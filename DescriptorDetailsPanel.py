@@ -25,6 +25,10 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.OnBeginLabelEdit)
 		self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.OnEndLabelEdit)
 
+	def getPossibleLinks(self, element):
+		if element.linkType == "stringIndex":
+			return self.descriptorList.getStringDescriptors()
+
 	def OnBeginLabelEdit(self, event):
 		indices = self.GetIndexOfItem(event.GetItem())
 		e = self.descriptor.elements[indices[0]]
@@ -38,9 +42,13 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 			return
 
 		if e.elementType == "enum":
-			menu = wx.Menu()
-
 			items = sorted(e.enum.iteritems(), key=lambda(k,v): (v,k))
+
+		if e.elementType == "link":
+			items = self.getPossibleLinks(e).items()
+
+		if items:
+			menu = wx.Menu()
 
 			for (k, v) in items:
 				if v != k:

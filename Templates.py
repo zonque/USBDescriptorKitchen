@@ -215,7 +215,7 @@ def createEndpointDescriptorTemplate():
 
 def createDeviceQualifierTemplate():
 	desc = DescriptorClass("DeviceQualifier")
-	desc.allowedParents.append("Root")
+	desc.allowedParents.append("ConfigurationDescriptor")
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
 	elem.autoMethod = "descriptorSize"
