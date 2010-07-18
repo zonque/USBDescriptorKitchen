@@ -146,8 +146,11 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 	def OnEnumSelected(self, event):
 		selected = event.GetId() - 1
 		e = self.editedElement
-		self.editedElement = None
+		if not e:
+			return;
+
 		e.setValue(e.enumVals[selected])
+		self.editedElement = None
 
 		event.Skip()
 		self.RefreshItems()
