@@ -13,13 +13,13 @@ import Templates
 
 class MainWindow(wx.Panel):
 
-	def __init__(self, parent):
+	def __init__(self, parent, templates):
 		wx.Panel.__init__(self, parent)
 
 		splitter = wx.SplitterWindow(self, -1, style=wx.CLIP_CHILDREN | wx.SP_LIVE_UPDATE | wx.SP_3D)
 
 		self.descriptorDetailPanel = DescriptorDetailsPanel.DescriptorDetailsPanel(splitter)
-		self.descriptorTree = TreeCtrl.CustomTreeCtrl(splitter, self.descriptorDetailPanel)
+		self.descriptorTree = TreeCtrl.CustomTreeCtrl(splitter, self.descriptorDetailPanel, templates)
 
 		splitter.SplitVertically(self.descriptorTree, self.descriptorDetailPanel, 300)
 		splitter.SetMinimumPaneSize(300)
@@ -34,12 +34,10 @@ class MainWindow(wx.Panel):
 
 class MainFrame(wx.Frame):
 
-	def __init__(self, parent):
+	def __init__(self, parent, templates):
 		wx.Frame.__init__(self, parent, wx.ID_ANY, "USB Descriptor Kitchen", size=(900, 400))
 
 		self.CenterOnScreen()
-
-		self.templates = []
 
 		menuBar = wx.MenuBar()
 		menu1 = wx.Menu()
@@ -53,7 +51,7 @@ class MainFrame(wx.Frame):
 		submenu = wx.Menu()
 		menuid = 1000
 
-		self.templates = Templates.createTemplates()
+		self.templates = templates
 		for t in self.templates:
 			submenu.Append(menuid, t.descriptorType)
 			self.Bind(wx.EVT_MENU, self.OnAddDescriptor, id=menuid)
@@ -62,9 +60,6 @@ class MainFrame(wx.Frame):
 		menu2 = wx.Menu()
 		menu2.AppendMenu(201, "&Add", submenu)
 		menu2.Append(202, "&Remove selected", "")
-
-		menu2.Append(111, "add field", "")
-		menu2.Append(112, "remove field", "")
 
 		menu2.AppendSeparator()
 		menu2.Append(203, "&Dump", "")
@@ -81,17 +76,7 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.OnDump, id=203)
 		self.Bind(wx.EVT_MENU, self.OnClearDescriptors, id=204)
 
-
-		self.Bind(wx.EVT_MENU, self.OnAddField, id=111)
-		self.Bind(wx.EVT_MENU, self.OnRemoveField, id=112)
-
 		#descriptorParser.parseDescriptorFromFile("bla", self.templates)
-
-	def OnAddField(self, event):
-		self.tree.descriptorDetailPanel.detailsList.OnAddField(event)
-
-	def OnRemoveField(self, event):
-		self.tree.descriptorDetailPanel.detailsList.OnRemoveField(event)
 
 	def OnCloseWindow(self, event):
 		self.Close()
@@ -149,9 +134,11 @@ class MainFrame(wx.Frame):
 if __name__ == '__main__':
 	import sys,os
 
+	templates = Templates.createTemplates()
+
 	app = wx.App(False)
-	frame = MainFrame(None)
-	MainWindow(frame)
+	frame = MainFrame(None, templates)
+	MainWindow(frame, templates)
 	frame.Show(True)
 	app.MainLoop()
 

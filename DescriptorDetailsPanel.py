@@ -24,6 +24,30 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 
 		self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.OnBeginLabelEdit)
 		self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.OnEndLabelEdit)
+		self.Bind(wx.EVT_TREE_ITEM_RIGHT_CLICK, self.OnItemMenu)
+
+	def OnItemMenu(self, event):
+		# ignore right click other than on selection
+		if self.GetSelection() != event.GetItem():
+			return
+
+		indices = self.GetIndexOfItem(event.GetItem())
+		e = self.descriptor.elements[indices[0]]
+
+		if len(indices) == 2:
+			e = e.bitmap[indices[1]]
+
+		if not e.createdByArray:
+			return
+
+		menu = wx.Menu()
+		menu.AppendItem(wx.MenuItem(menu, 100, "&Add field"))
+		menu.AppendItem(wx.MenuItem(menu, 101, "&Remove field"))
+
+		menu.Bind(wx.EVT_MENU, self.OnAddField, id=100)
+		menu.Bind(wx.EVT_MENU, self.OnRemoveField, id=101)
+
+		self.PopupMenu(menu)
 
 	def getPossibleLinks(self, element):
 		if element.linkType == "stringIndex":

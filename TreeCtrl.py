@@ -5,7 +5,7 @@ import DescriptorDetailsPanel
 import Template
 
 class CustomTreeCtrl(CT.CustomTreeCtrl):
-	def __init__(self, parent, descriptorDetailPanel,
+	def __init__(self, parent, descriptorDetailPanel, templates,
 			 id=wx.ID_ANY, pos=wx.DefaultPosition,
 			 size=wx.DefaultSize,
 			 style=wx.SUNKEN_BORDER | CT.TR_HAS_BUTTONS | CT.TR_HAS_VARIABLE_ROW_HEIGHT | wx.WANTS_CHARS):
@@ -15,14 +15,55 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		self.item = None
 		self.descriptorDetailPanel = descriptorDetailPanel
 		self.descriptors = []
+		self.templates = templates
 
 		self.BuildTree()
 
 		self.Bind(CT.EVT_TREE_SEL_CHANGED, self.OnSelChanged)
 		self.Bind(CT.EVT_TREE_BEGIN_DRAG, self.OnBeginDrag)
 		self.Bind(CT.EVT_TREE_END_DRAG, self.OnEndDrag)
+		self.Bind(wx.EVT_TREE_ITEM_RIGHT_CLICK, self.OnItemMenu)
 
 		descriptorDetailPanel.setDescriptorList(self)
+
+	def OnItemMenu(self, event):
+		# ignore right click other than on selection
+		if self.GetSelection() != event.GetItem():
+			return
+
+		desc = self.GetPyData(event.GetItem())
+		if desc:
+			parentType = desc.descriptorType
+		else:
+			parentType = "Root"
+
+		submenu = wx.Menu()
+		menuid = 1000
+
+		for t in self.templates:
+			if parentType in t.allowedParents:
+				submenu.Append(menuid, t.descriptorType)
+				self.Bind(wx.EVT_MENU, self.OnAddDescriptor, id=menuid)
+
+			menuid += 1
+
+		menu = wx.Menu()
+
+		if submenu.GetMenuItemCount():
+			menu.AppendMenu(100, "&Add", submenu)
+
+		menu.AppendItem(wx.MenuItem(menu, 101, "&Remove"))
+		menu.Bind(wx.EVT_MENU, self.OnRemoveDescriptor, id=101)
+
+		self.PopupMenu(menu)
+
+	def OnAddDescriptor(self, event):
+		idx = event.GetId() - 1000
+		desc = copy.deepcopy(self.templates[idx])
+		self.AddDescriptor(desc)
+
+	def OnRemoveDescriptor(self, event):
+		self.RemoveSelectedDescriptor()
 
 	def AddDescriptor(self, newdescriptor, root=None):
 		if not root:
