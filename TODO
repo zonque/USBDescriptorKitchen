@@ -1,0 +1,7 @@
+- fix drag and drop of nested descriptors
+- make ordering of descriptors in same level possible
+- implement sanity check framework
+- implement UAC2 mixer unit (will need some quirks)
+- implement proper export to file
+- implement readback of c structs
+
