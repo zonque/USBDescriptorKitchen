@@ -22,7 +22,7 @@ def createDeviceDescriptorTemplate():
 	elem.comment = "DEVICE Descriptor Type"
 	desc.addElement(elem)
 
-	elem = DescriptorElementClass("enum", size = 1, name = "bcdUSB")
+	elem = DescriptorElementClass("enum", size = 2, name = "bcdUSB")
 	elem.enum = { "1.1": 0x0101, "2.0": 0x0200 }
 	elem.value = 0x0200
 	elem.comment = "USB Specification Release Number in Binary-Coded Decimal"
@@ -75,7 +75,8 @@ def createDeviceDescriptorTemplate():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bNumConfigurations")
-	elem.autoMethod = "countChildrenOfType:ConfigurationDescriptor"
+	elem.autoMethod = "countDescriptorsOfType"
+	elem.autoMethodDetail = "ConfigurationDescriptor"
 	elem.comment = "Number of possible configurations"
 	desc.addElement(elem)
 
@@ -101,7 +102,8 @@ def createConfigDescriptorTemplate():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bNumInterfaces")
-	elem.autoMethod = "countChildrenOfType:InterfaceDescriptor"
+	elem.autoMethod = "countChildrenOfType"
+	elem.autoMethodDetail = "InterfaceDescriptor"
 	elem.comment = "Number of interfaces supported by this configuration"
 	desc.addElement(elem)
 
@@ -179,7 +181,8 @@ def createInterfaceDescriptorTemplate():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bNumEndpoints")
-	elem.autoMethod = "countChildrenOfType:EndpointDescriptor"
+	elem.autoMethod = "countChildrenOfType"
+	elem.autoMethodDetail = "EndpointDescriptor"
 	elem.comment = "Number of endpoints used by this interface"
 	desc.addElement(elem)
 
@@ -260,7 +263,7 @@ def createDeviceQualifierTemplate():
 	elem.comment = "Device Qualifier Type"
 	desc.addElement(elem)
 
-	elem = DescriptorElementClass("enum", size = 1, name = "bcdUSB")
+	elem = DescriptorElementClass("enum", size = 2, name = "bcdUSB")
 	elem.enum = { "1.1": 0x0101, "2.0": 0x0200 }
 	elem.value = 0x0200
 	elem.comment = "USB specification version number"

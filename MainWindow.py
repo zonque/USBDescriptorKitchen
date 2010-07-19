@@ -4,11 +4,13 @@ import wx
 import os
 import copy
 import string
+import re
 
 import Descriptor
 import TreeCtrl
 import DescriptorDetailsPanel
 import Templates
+import descriptorParser
 
 class MainWindow(wx.Panel):
 
@@ -32,6 +34,7 @@ class MainWindow(wx.Panel):
 		parent.setTree(tree)
 
 class MainFrame(wx.Frame):
+
 	def __init__(self, parent):
 		wx.Frame.__init__(self, parent, wx.ID_ANY, "USB Descriptor Kitchen", size=(900, 400))
 
@@ -74,6 +77,8 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.OnRemoveDescriptor, id=202)
 		self.Bind(wx.EVT_MENU, self.OnDump, id=203)
 		self.Bind(wx.EVT_MENU, self.OnClearDescriptors, id=204)
+
+		#descriptorParser.parseDescriptorFromFile("bla", self.templates)
 
 	def OnCloseWindow(self, event):
 		self.Close()

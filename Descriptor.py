@@ -38,17 +38,42 @@ class DescriptorElementClass:
 		if not val:
 			val = self.value
 
+		key = None
+
 		for (k, v) in self.enum.items():
 			if self.convertToInt(self.value) == self.convertToInt(v):
-				value = k
+				key = k
 
-		return value
+		if not key:
+			print "Ooops ... val %d not in enum %s" % (val, self.name)
+
+		return key
 
 	def getValue(self):
 		if self.elementType == "string":
 			return self.strValue
 		else:
 			return self.value
+
+	def setValue(self, value):
+		p = self.parentElement
+
+		if self.elementType == "string":
+			self.strValue = value
+			self.comment = "\"%s\"" % self.strValue
+			return
+
+		if p:
+			if p.elementType == "bitmap":
+				mask = (1 << self.size) - 1
+				self.value = self.convertToInt(value)
+				v = p.value
+				v &= ~(mask << self.offset)
+				v |= self.value << self.offset
+				p.value = v
+		else:
+			mask = (1 << (self.size * 8)) - 1
+			self.value = self.convertToInt(value) & mask
 
 	def prettyPrint(self, value = None):
 		if not value:
@@ -147,26 +172,6 @@ class DescriptorElementClass:
 			except:
 				self.size = 0
 
-	def setValue(self, value):
-		p = self.parentElement
-
-		if self.elementType == "string":
-			self.strValue = value
-			self.comment = "\"%s\"" % self.strValue
-			return
-
-		if p:
-			if p.elementType == "bitmap":
-				mask = (1 << self.size) - 1
-				self.value = self.convertToInt(value)
-				v = p.value
-				v &= ~(mask << self.offset)
-				v |= self.value << self.offset
-				p.value = v
-		else:
-			mask = (1 << (self.size * 8)) - 1
-			self.value = self.convertToInt(value) & mask
-
 	def appendBitmap(self, bitmap):
 		bitmap.parentElement = self
 		self.bitmap.append(bitmap)
@@ -214,6 +219,15 @@ class DescriptorClass:
 
 		return count
 
+	def countDescriptorsOfType(self, cType):
+		count = 0
+
+		for d in self.parentList:
+			if d.descriptorType == cType:
+				count += 1
+
+		return count
+
 	def getIndexFromParentList(self):
 		idx = 0
 		for d in self.parentList:
@@ -245,6 +259,9 @@ class DescriptorClass:
 
 			if e.autoMethod == "countChildrenOfType":
 				e.value = self.countChildrenOfType(e.autoMethodDetail)
+
+			if e.autoMethod == "countDescriptorsOfType":
+				e.value = self.countDescriptorsOfType(e.autoMethodDetail)
 
 			if e.autoMethod == "indexOfDescriptor":
 				e.value = self.getIndexFromParentList() + e.base
