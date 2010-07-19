@@ -1,6 +1,12 @@
-class DescriptorLink:
-	descriptorType = 0
-	descriptorField = ""
+class DescriptorElementArrayClass:
+	def __init__(self, name, after):
+		self.name = name
+		self.after = after
+		self.numEntries = 1
+		self.bitmap = []
+
+	def appendBitmap(self, bitmap):
+		self.bitmap.append(bitmap)
 
 class DescriptorElementClass:
 	def __init__(self, elementType = "UNKNOWN", size = 0, name = ""):
@@ -13,10 +19,12 @@ class DescriptorElementClass:
 		self.strValue = ""
 		self.displayValue = ""
 		self.base = 0
+		self.offset = 0
 		self.enum = {}
 		self.bitmap = []
 		self.autoMethod = ""
 		self.autoMethodDetail = 0
+		self.createdByArray = False
 		self.parentElement = None
 
 	def convertToInt(self, data):
@@ -180,6 +188,7 @@ class DescriptorClass:
 	def __init__(self, descriptorType = "", comment = ""):
 		self.elements = []
 		self.children = []
+		self.arrays = []
 		self.descriptorType = descriptorType
 		self.comment = comment
 		self.allowedParents = []
@@ -209,6 +218,9 @@ class DescriptorClass:
 
 	def addChild(self, child):
 		self.children.append(child)
+
+	def addElementArray(self, array):
+		self.arrays.append(array)
 
 	def countChildrenOfType(self, cType):
 		count = 0
@@ -241,7 +253,84 @@ class DescriptorClass:
 
 		return -1
 
+	def addArrayField(self, elem):
+		if not elem.createdByArray:
+			return
+
+		for a in self.arrays:
+			if a.arrayLength != "dynamic":
+				continue
+
+			if elem.name[:len(a.name)] == a.name:
+				a.numEntries += 1
+
+		self.handleAutoFields()
+
+	def removeArrayField(self, elem):
+		if not elem.createdByArray:
+			return
+
+		for a in self.arrays:
+			if a.arrayLength != "dynamic":
+				continue
+
+			if a.numEntries < 2:
+				continue
+
+			if elem.name[:len(a.name)] == a.name:
+				a.numEntries -= 1
+
+		self.handleAutoFields()
+
+	def handleArrays(self):
+		# create elements from arrays
+		for a in self.arrays:
+			savedValues = []
+
+			# remove all elements that have been created dynamically
+			elements = self.elements[:]
+
+			for e in elements:
+				if e.createdByArray and e.name[:len(a.name)] == a.name:
+					savedValues.append(e.value)
+					self.elements.remove(e)
+
+			if a.arrayLength == "given":
+				num = self.getValue(a.arrayLengthField)
+
+			if a.arrayLength == "dynamic":
+				num = a.numEntries
+
+			idx = 0
+			# find element to create new things after
+			elements = self.elements[:]
+			for e in elements:
+				if e.name == a.after:
+					for i in range(num):
+						name = "%s(%d)" % (a.name, i)
+						elem = DescriptorElementClass(elementType = a.arrayMemberType, size = a.arrayMemberSize, name = name)
+						elem.createdByArray = True
+
+						for b in a.bitmap:
+							elem.appendBitmap(b)
+
+						# try to restore former values
+						try:
+							elem.value = savedValues[i]
+						except:
+							elem.value = 0
+
+						self.elements.insert(idx  + 1, elem)
+						idx += 1
+
+					break
+
+				idx += 1
+
 	def handleAutoFields(self):
+
+		self.handleArrays()
+
 		idx = 0
 		for c in self.children:
 			c.handleAutoFields()

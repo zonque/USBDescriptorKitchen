@@ -63,6 +63,10 @@ class MainFrame(wx.Frame):
 		menu2 = wx.Menu()
 		menu2.AppendMenu(201, "&Add", submenu)
 		menu2.Append(202, "&Remove selected", "")
+
+		menu2.Append(111, "add field", "")
+		menu2.Append(112, "remove field", "")
+
 		menu2.AppendSeparator()
 		menu2.Append(203, "&Dump", "")
 		menu2.AppendSeparator()
@@ -78,7 +82,17 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.OnDump, id=203)
 		self.Bind(wx.EVT_MENU, self.OnClearDescriptors, id=204)
 
+
+		self.Bind(wx.EVT_MENU, self.OnAddField, id=111)
+		self.Bind(wx.EVT_MENU, self.OnRemoveField, id=112)
+
 		#descriptorParser.parseDescriptorFromFile("bla", self.templates)
+
+	def OnAddField(self, event):
+		self.tree.descriptorDetailPanel.detailsList.OnAddField(event)
+
+	def OnRemoveField(self, event):
+		self.tree.descriptorDetailPanel.detailsList.OnRemoveField(event)
 
 	def OnCloseWindow(self, event):
 		self.Close()

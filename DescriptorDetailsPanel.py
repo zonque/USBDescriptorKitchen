@@ -18,7 +18,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		self.AddColumn("Value", width=150, edit=True)
 		self.AddColumn("Type", width=50)
 		self.AddColumn("Comment", width=200)
-		self.AddColumn("Size")
+		self.AddColumn("Size", width=50)
 
 		self.editedElement = None
 
@@ -143,6 +143,28 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		event.Skip()
 		self.RefreshItems()
 		self.descriptorList.UpdateSummaryNames()
+
+	def OnAddField(self, event):
+		item = self.GetSelection()
+		indices = self.GetIndexOfItem(item)
+		e = self.descriptor.elements[indices[0]]
+
+		if len(indices) == 2:
+			e = e.bitmap[indices[1]]
+
+		self.descriptor.addArrayField(e)
+		self.RefreshItems()
+
+	def OnRemoveField(self, event):
+		item = self.GetSelection()
+		indices = self.GetIndexOfItem(item)
+		e = self.descriptor.elements[indices[0]]
+
+		if len(indices) == 2:
+			e = e.bitmap[indices[1]]
+
+		self.descriptor.removeArrayField(e)
+		self.RefreshItems()
 
 	def SetDescriptor(self, descriptor):
 		self.descriptor = descriptor
