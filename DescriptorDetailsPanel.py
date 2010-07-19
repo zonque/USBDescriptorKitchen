@@ -53,6 +53,14 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		if element.linkType == "stringIndex":
 			return self.descriptorList.getStringDescriptors()
 
+		if element.linkType == "UAC2Unit":
+			return self.descriptorList.findDescriptorsWithField("bUnitID", "UAC2")
+
+		if element.linkType == "UAC2Clock":
+			return self.descriptorList.findDescriptorsWithField("bClockID", "UAC2")
+
+		print "Missing implementation for link type %s" % element.linkType
+
 	def OnBeginLabelEdit(self, event):
 		indices = self.GetIndexOfItem(event.GetItem())
 		e = self.descriptor.elements[indices[0]]
@@ -69,7 +77,12 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 			items = sorted(e.enum.iteritems(), key=lambda(k,v): (v,k))
 
 		if e.elementType == "link":
-			items = self.getPossibleLinks(e).items()
+			p = self.getPossibleLinks(e)
+
+			if not p:
+				return
+
+			items = p.items()
 
 		if items:
 			menu = wx.Menu()

@@ -123,6 +123,37 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
 		return l
 
+	def resolveStringDescriptor(self, strid):
+		if strid == 0:
+			return None
+
+		for d in self.descriptors:
+			if d.descriptorType != "StringDescriptor":
+				continue
+
+			strid -= 1
+			if strid == 0:
+				return d.getValue("bString")
+
+	def findDescriptorsWithField(self, field, typeConstraint = ""):
+		l = {}
+		for d in self.descriptors:
+			if d.descriptorType[:len(typeConstraint)] == typeConstraint and d.hasField(field):
+				n = d.getValue(field)
+				s = None
+
+				if d.descriptiveString:
+					s = self.resolveStringDescriptor(d.getValue(d.descriptiveString))
+					if s:
+						s += " (%d)" % n
+
+				if not s:
+					s = str(n)
+
+				l[s] = n
+
+		return l
+
 	def BuildTree(self):
 		self.DeleteAllItems()
 		self.root = self.AddRoot("Root")
@@ -142,6 +173,12 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 			if desc:
 				desc.handleAutoFields()
 				name = desc.getSummaryName()
+
+				if desc.descriptiveString:
+					descriptive = self.resolveStringDescriptor(desc.getValue(desc.descriptiveString))
+					if descriptive:
+						name += " (%s)" % descriptive
+
 				self.SetItemText(item, name)
 
 			item = self.GetNext(item)
@@ -174,7 +211,6 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		self.descriptorDetailPanel.SetDescriptor(d)
 
 		event.Skip()
-
 
 	def OnBeginDrag(self, event):
 		self.item = event.GetItem()

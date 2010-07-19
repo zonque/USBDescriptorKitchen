@@ -80,6 +80,8 @@ def createDeviceDescriptorTemplate():
 	elem.comment = "Number of possible configurations"
 	desc.addElement(elem)
 
+	desc.descriptiveString = "iProduct"
+
 	return desc
 
 def createConfigDescriptorTemplate():
@@ -135,6 +137,8 @@ def createConfigDescriptorTemplate():
 	elem.comment = ""
 	elem.comment = "Maximum power consumption of the USB, device. Expressed in 2 mA units"
 	desc.addElement(elem)
+
+	desc.descriptiveString = "iConfiguration"
 
 	return desc
 
@@ -202,6 +206,8 @@ def createInterfaceDescriptorTemplate():
 	elem.linkType = "stringIndex"
 	elem.comment = "Index of string descriptor describing this interface"
 	desc.addElement(elem)
+
+	desc.descriptiveString = "iInterface"
 
 	return desc
 
@@ -340,6 +346,8 @@ def createInterfaceAssociationDescriptorTemplate():
 	elem = DescriptorElementClass(elementType = "link", size = 1, name = "iFunction")
 	elem.linkType = "stringIndex"
 	desc.addElement(elem)
+
+	desc.descriptiveString = "iFunction"
 
 	return desc
 
@@ -552,6 +560,8 @@ def createUAC2InputTerminalDescriptorTemplate():
 	elem.linkType = "stringIndex"
 	desc.addElement(elem)
 
+	desc.descriptiveString = "iTerminal"
+
 	return desc
 
 def createUAC2OutputTerminalDescriptorTemplate():
@@ -610,6 +620,8 @@ def createUAC2OutputTerminalDescriptorTemplate():
 	elem.linkType = "stringIndex"
 	desc.addElement(elem)
 
+	desc.descriptiveString = "iTerminal"
+
 	return desc
 
 def createUAC2MixerUnitDescriptorTemplate():
@@ -660,6 +672,8 @@ def createUAC2SelectorUnitDescriptorTemplate():
 	elem = DescriptorElementClass(elementType = "link", size = 1, name = "iSelector")
 	elem.linkType = "stringIndex"
 	desc.addElement(elem)
+
+	desc.descriptiveString = "iSelector"
 
 	return desc
 
@@ -713,6 +727,8 @@ def createUAC2FeatureUnitDescriptorTemplate():
 	elem.linkType = "stringIndex"
 	desc.addElement(elem)
 
+	desc.descriptiveString = "iFeature"
+
 	return desc
 
 def createUAC2ClockSourceDescriptorTemplate():
@@ -760,6 +776,8 @@ def createUAC2ClockSourceDescriptorTemplate():
 	elem.linkType = "stringIndex"
 	desc.addElement(elem)
 
+	desc.descriptiveString = "iClockSource"
+
 	return desc
 
 def createUAC2ClockSelectorUnitDescriptorTemplate():
@@ -789,7 +807,8 @@ def createUAC2ClockSelectorUnitDescriptorTemplate():
 	elem = DescriptorElementArrayClass("baCSourceID", "bNrInPins")
 	elem.arrayLength = "given"
 	elem.arrayLengthField = "bNrInPins"
-	elem.arrayMemberType = "variable"
+	elem.arrayMemberType = "link"
+	elem.arrayMemberLinkType = "UAC2Clock"
 	elem.arrayMemberSize = 1
 	desc.addElementArray(elem)
 
@@ -800,6 +819,8 @@ def createUAC2ClockSelectorUnitDescriptorTemplate():
 	elem = DescriptorElementClass(elementType = "link", size = 1, name = "iClockSelector")
 	elem.linkType = "stringIndex"
 	desc.addElement(elem)
+
+	desc.descriptiveString = "iClockSelector"
 
 	return desc
 
@@ -835,6 +856,8 @@ def createUAC2ClockMultiplierDescriptorTemplate():
 	elem = DescriptorElementClass(elementType = "link", size = 1, name = "iClockMultiplier")
 	elem.linkType = "stringIndex"
 	desc.addElement(elem)
+
+	desc.descriptiveString = "iClockMultiplier"
 
 	return desc
 
@@ -874,6 +897,8 @@ def createUAC2SamplingRateConverterUnitDescriptorTemplate():
 	elem = DescriptorElementClass(elementType = "link", size = 1, name = "iSRC")
 	elem.linkType = "stringIndex"
 	desc.addElement(elem)
+
+	desc.descriptiveString = "iSRC"
 
 	return desc
 

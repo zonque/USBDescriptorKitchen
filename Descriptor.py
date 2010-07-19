@@ -6,6 +6,7 @@ class DescriptorElementArrayClass:
 		self.after = after
 		self.numEntries = 1
 		self.bitmap = []
+		self.arrayMemberLinkType = ""
 
 	def appendBitmap(self, bitmap):
 		self.bitmap.append(bitmap)
@@ -194,6 +195,7 @@ class DescriptorClass:
 		self.descriptorType = descriptorType
 		self.comment = comment
 		self.allowedParents = []
+		self.descriptiveString = None
 
 	def setParentList(self, pl):
 		self.parentList = pl
@@ -223,6 +225,13 @@ class DescriptorClass:
 
 	def addElementArray(self, array):
 		self.arrays.append(array)
+
+	def hasField(self, field):
+		for e in self.elements:
+			if e.name == field:
+				return 1
+
+		return 0
 
 	def countChildrenOfType(self, cType):
 		count = 0
@@ -312,6 +321,7 @@ class DescriptorClass:
 						name = "%s(%d)" % (a.name, i)
 						elem = DescriptorElementClass(elementType = a.arrayMemberType, size = a.arrayMemberSize, name = name)
 						elem.createdByArray = True
+						elem.linkType = a.arrayMemberLinkType
 
 						for b in a.bitmap:
 							bitmap = copy.deepcopy(b)
