@@ -6,6 +6,7 @@ class DescriptorElementArrayClass:
 		self.after = after
 		self.numEntries = 1
 		self.bitmap = []
+		self.enum = []
 		self.arrayMemberLinkType = ""
 
 	def appendBitmap(self, bitmap):
@@ -322,6 +323,7 @@ class DescriptorClass:
 						elem = DescriptorElementClass(elementType = a.arrayMemberType, size = a.arrayMemberSize, name = name)
 						elem.createdByArray = True
 						elem.linkType = a.arrayMemberLinkType
+						elem.enum = a.enum
 
 						for b in a.bitmap:
 							bitmap = copy.deepcopy(b)
@@ -332,7 +334,7 @@ class DescriptorClass:
 						try:
 							elem.value = savedValues[i]
 						except:
-							elem.value = 0
+							elem.value = a.defaultValue
 
 						self.elements.insert(idx  + 1, elem)
 						idx += 1

@@ -123,7 +123,10 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 			return e.prettyPrint()
 
 		if column == 2:
-			return e.elementType
+			t = e.elementType
+			if e.createdByArray:
+				t += "[]"
+			return t
 
 		if column == 3:
 			return e.comment
