@@ -1,3 +1,5 @@
+import copy
+
 class DescriptorElementArrayClass:
 	def __init__(self, name, after):
 		self.name = name
@@ -312,7 +314,9 @@ class DescriptorClass:
 						elem.createdByArray = True
 
 						for b in a.bitmap:
-							elem.appendBitmap(b)
+							bitmap = copy.deepcopy(b)
+							bitmap.parentElement = self
+							elem.appendBitmap(bitmap)
 
 						# try to restore former values
 						try:
