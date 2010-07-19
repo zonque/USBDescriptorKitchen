@@ -8,6 +8,7 @@ class DescriptorElementArrayClass:
 		self.bitmap = []
 		self.enum = []
 		self.arrayMemberLinkType = ""
+		self.defaultValue = 0
 
 	def appendBitmap(self, bitmap):
 		self.bitmap.append(bitmap)

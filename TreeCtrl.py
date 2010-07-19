@@ -2,7 +2,6 @@ import wx
 import copy
 import wx.lib.customtreectrl as CT
 import DescriptorDetailsPanel
-import Template
 
 class CustomTreeCtrl(CT.CustomTreeCtrl):
 	def __init__(self, parent, descriptorDetailPanel, templates,
@@ -135,24 +134,33 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 			if strid == 0:
 				return d.getValue("bString")
 
+	def findDescriptorsWithFieldRecursive(self, desc, field, typeConstraint, resultList):
+		if desc.descriptorType[:len(typeConstraint)] == typeConstraint and desc.hasField(field):
+			n = desc.getValue(field)
+			s = None
+
+			if desc.descriptiveString:
+				s = self.resolveStringDescriptor(desc.getValue(desc.descriptiveString))
+				if s:
+					s += " (%d)" % n
+
+			if not s:
+				s = str(n)
+
+			resultList[s] = n
+
+		for c in desc.children:
+			self.findDescriptorsWithFieldRecursive(c, field, typeConstraint, resultList)
+
+		return resultList
+
 	def findDescriptorsWithField(self, field, typeConstraint = ""):
-		l = {}
+		resultList = {}
+
 		for d in self.descriptors:
-			if d.descriptorType[:len(typeConstraint)] == typeConstraint and d.hasField(field):
-				n = d.getValue(field)
-				s = None
+			self.findDescriptorsWithFieldRecursive(d, field, typeConstraint, resultList)
 
-				if d.descriptiveString:
-					s = self.resolveStringDescriptor(d.getValue(d.descriptiveString))
-					if s:
-						s += " (%d)" % n
-
-				if not s:
-					s = str(n)
-
-				l[s] = n
-
-		return l
+		return resultList
 
 	def BuildTree(self):
 		self.DeleteAllItems()

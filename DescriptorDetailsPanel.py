@@ -73,6 +73,8 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 			self.editedElement = e
 			return
 
+		items = None
+
 		if e.elementType == "enum":
 			items = sorted(e.enum.iteritems(), key=lambda(k,v): (v,k))
 
@@ -80,6 +82,8 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 			p = self.getPossibleLinks(e)
 
 			if not p:
+				print "No possible links for type %s" % e.linkType
+				event.Veto()
 				return
 
 			items = p.items()
