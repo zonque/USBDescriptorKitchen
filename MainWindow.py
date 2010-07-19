@@ -10,7 +10,6 @@ import Descriptor
 import TreeCtrl
 import DescriptorDetailsPanel
 import Templates
-import descriptorParser
 
 class MainWindow(wx.Panel):
 
