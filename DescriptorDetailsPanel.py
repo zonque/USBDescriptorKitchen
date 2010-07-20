@@ -21,6 +21,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		self.AddColumn("Size", width=50)
 
 		self.editedElement = None
+		self.descriptor = None
 
 		self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.OnBeginLabelEdit)
 		self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.OnEndLabelEdit)
@@ -153,7 +154,10 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 
 	def OnGetChildrenCount(self, indices):
 		if len(indices) == 0:
-			return len(self.descriptor.elements)
+			if (self.descriptor):
+				return len(self.descriptor.elements)
+			else:
+				return 0
 
 		index = indices[0]
 		e = self.descriptor.elements[index]

@@ -450,6 +450,7 @@ class DescriptorClass:
 		
 		for e in self.elements:
 			print indent + "element %s" % e.name
+			print indent + "value %d" % e.value
 		
 		indent += "  "
 		for c in self.children:

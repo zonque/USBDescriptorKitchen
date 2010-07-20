@@ -7,6 +7,7 @@ import string
 import re
 
 import Descriptor
+import DescriptorParser
 import TreeCtrl
 import DescriptorDetailsPanel
 import Templates
@@ -76,8 +77,6 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.OnDump, id=203)
 		self.Bind(wx.EVT_MENU, self.OnClearDescriptors, id=204)
 
-		#descriptorParser.parseDescriptorFromFile("bla", self.templates)
-
 	def OnCloseWindow(self, event):
 		self.Close()
 
@@ -129,6 +128,10 @@ class MainFrame(wx.Frame):
 
 	def setTree(self, tree):
 		self.tree = tree
+
+		for d in DescriptorParser.parseDescriptorFromFile("bla", self.templates):
+			#print d
+			self.tree.AddDescriptor(d)
 
 
 if __name__ == '__main__':
