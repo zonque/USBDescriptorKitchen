@@ -59,6 +59,9 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		if element.linkType == "UAC2Clock":
 			return self.descriptorList.findDescriptorsWithField("bClockID", "UAC2")
 
+		if element.linkType == "MIDIID":
+			return self.descriptorList.findDescriptorsWithField("bJackID", "MIDI")
+
 		print "Missing implementation for link type %s" % element.linkType
 
 	def OnBeginLabelEdit(self, event):

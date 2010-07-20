@@ -350,8 +350,7 @@ def createInterfaceDescriptorTemplate():
 	elem.comment = "INTERFACE Descriptor Type"
 	desc.addElement(elem)
 
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bInterfaceNumber")
-	elem.autoMethod = "indexOfDescriptor"
+	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bInterfaceNumber")
 	elem.comment = "Number of this interface. Zero-based value."
 	desc.addElement(elem)
 
@@ -369,8 +368,12 @@ def createInterfaceDescriptorTemplate():
 	elem.comment = "Class code (assigned by the USB-IF)."
 	desc.addElement(elem)
 
-	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bInterfaceSubClass")
+	elem = DescriptorElementClass(elementType = "enum", size = 1, name = "bInterfaceSubClass")
 	elem.comment = "Subclass code (assigned by the USB-IF)."
+	elem.enum = {
+					"0": 0, "1": 1, "2": 2,
+					"AUDIOCONTROL": 0x01, "MIDISTREAMING": 0x03
+				}
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bInterfaceProtocol")
@@ -569,7 +572,6 @@ def createDFUFunctionDescriptorTemplate():
 
 	return desc
 
-
 # USB AUDIO CLASS 2
 
 def createUACbmControls(name, offset):
@@ -579,7 +581,8 @@ def createUACbmControls(name, offset):
 	bitmap.enum = { "Off": 0, "read-only": 1, "read/write": 3 }
 	return bitmap
 
-UAC2SpatialLocations = { 	"Front Left - FL": 0,
+UAC2SpatialLocations = {
+				"Front Left - FL": 0,
 				"Front Right - FR": 1,
 				"Front Center - FC": 2,
 				"Low Frequency Effects- LFE": 3,
@@ -643,7 +646,8 @@ def createUAC2InterfaceHeaderDescriptorTemplate():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "enum", size = 1, name = "bCategory")
-	elem.enum = { 	"FUNCTION_SUBCLASS_UNDEFINED": 0,
+	elem.enum = {
+			"FUNCTION_SUBCLASS_UNDEFINED": 0,
 			"DESKTOP_SPEAKER": 1,
 			"HOME_THEATER": 2,
 			"MICROPHONE": 3,
@@ -691,7 +695,8 @@ def createUAC2InputTerminalDescriptorTemplate():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "enum", size = 2, name = "wTerminalType")
-	elem.enum = { 	"USB Undefined": 0x0100,
+	elem.enum = {
+			"USB Undefined": 0x0100,
 			"USB streaming": 0x0101,
 			"USB vendor specific": 0x01ff,
 			"Input Undefined": 0x0200,
@@ -760,7 +765,8 @@ def createUAC2OutputTerminalDescriptorTemplate():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "enum", size = 2, name = "wTerminalType")
-	elem.enum = { 	"USB Undefined": 0x0100,
+	elem.enum = {
+			"USB Undefined": 0x0100,
 			"USB streaming": 0x0101,
 			"USB vendor specific": 0x01ff,
 			"Output Undefined": 0x0300,
@@ -919,7 +925,8 @@ def createUAC2ClockSourceDescriptorTemplate():
 
 	elem = DescriptorElementClass(elementType = "bitmap", size = 1, name = "bmAttributes")
 	bitmap = DescriptorElementClass(elementType = "enum", size = 2, name = "Clock type")
-	bitmap.enum = { "External Clock": 0,
+	bitmap.enum = {
+			"External Clock": 0,
 			"Internal fixed Clock": 1,
 			"Internal variable Clock": 2,
 			"Internal programmable Clock": 3 }
@@ -969,13 +976,13 @@ def createUAC2ClockSelectorUnitDescriptorTemplate():
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bNrInPins")
 	desc.addElement(elem)
 
-	elem = DescriptorElementArrayClass("baCSourceID", "bNrInPins")
-	elem.arrayLength = "given"
-	elem.arrayLengthField = "bNrInPins"
-	elem.arrayMemberType = "link"
-	elem.arrayMemberLinkType = "UAC2Clock"
-	elem.arrayMemberSize = 1
-	desc.addElementArray(elem)
+	arr = DescriptorElementArrayClass("baCSourceID", "bNrInPins")
+	arr.arrayLength = "given"
+	arr.arrayLengthField = "bNrInPins"
+	arr.arrayMemberType = "link"
+	arr.arrayMemberLinkType = "UAC2Clock"
+	arr.arrayMemberSize = 1
+	desc.addElementArray(arr)
 
 	elem = DescriptorElementClass(elementType = "bitmap", size = 4, name = "bmControls")
 	elem.appendBitmap(createUACbmControls("Selector Control", 0))
@@ -1066,6 +1073,184 @@ def createUAC2SamplingRateConverterUnitDescriptorTemplate():
 
 	return desc
 
+def createAudioControlHeaderDescriptor():
+	desc = DescriptorClass("AudioControlHeaderDescriptor")
+	desc.allowedParents.append("InterfaceDescriptor")
+
+	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
+	elem.autoMethod = "descriptorSize"
+	elem.comment = "Size of this descriptor in bytes"
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
+	elem.value = 0x24
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorSubtype")
+	elem.value = 1
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "constant", size = 2, name = "bcdMSC")
+	elem.value = 0x100
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "wTotalLength")
+	elem.autoMethod = "descriptorSize"
+	elem.comment = "Total number of bytes returned for the class-specific AudioControl interface descriptor."
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bInCollection")
+	desc.addElement(elem)
+
+	arr = DescriptorElementArrayClass("baInterfaceNr", "bInCollection")
+	arr.arrayLength = "given"
+	arr.arrayLengthField = "bInCollection"
+	arr.arrayMemberType = "variable"
+	arr.arrayMemberSize = 1
+	desc.addElementArray(arr)
+
+	return desc
+
+def createMIDIStreamingHeaderDescriptor():
+	desc = DescriptorClass("MIDIStreamingHeaderDescriptor")
+	desc.allowedParents.append("InterfaceDescriptor")
+
+	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
+	elem.autoMethod = "descriptorSize"
+	elem.comment = "Size of this descriptor in bytes"
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
+	elem.value = 0x24
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorSubtype")
+	elem.value = 1
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "constant", size = 2, name = "bcdMSC")
+	elem.value = 0x100
+	
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "wTotalLength")
+	elem.autoMethod = "descriptorSize"
+	elem.comment = "Total number of bytes returned for the class-specific AudioControl interface descriptor."
+	desc.addElement(elem)
+
+	return desc
+
+def createMIDIInJackDescriptor():
+	desc = DescriptorClass("MIDIInJackDescriptor")
+	desc.allowedParents.append("InterfaceDescriptor")
+
+	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
+	elem.autoMethod = "descriptorSize"
+	elem.comment = "Size of this descriptor in bytes"
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
+	elem.value = 0x24
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "enum", size = 1, name = "bDescriptorSubtype")
+	elem.enum = { "MIDI_IN_JACK": 0x02, "MIDI_OUT_JACK": 0x03 }
+	elem.value = 2
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "enum", size = 1, name = "bJackType")
+	elem.enum = { "EMBEDDED": 0x01, "EXTERNAL": 0x02 }
+	elem.value = 0x01
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bJackID")
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "link", size = 1, name = "iJack")
+	elem.linkType = "stringIndex"
+	desc.addElement(elem)
+
+	desc.descriptiveString = "iJack"
+
+	return desc
+
+def createMIDIOutJackDescriptor():
+	desc = DescriptorClass("MIDIOutJackDescriptor")
+	desc.allowedParents.append("InterfaceDescriptor")
+
+	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
+	elem.autoMethod = "descriptorSize"
+	elem.comment = "Size of this descriptor in bytes"
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
+	elem.value = 0x24
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "enum", size = 1, name = "bDescriptorSubtype")
+	elem.enum = { "MIDI_IN_JACK": 0x02, "MIDI_OUT_JACK": 0x03 }
+	elem.value = 2
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "enum", size = 1, name = "bJackType")
+	elem.enum = { "EMBEDDED": 0x01, "EXTERNAL": 0x02 }
+	elem.value = 0x01
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bJackID")
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bNrInputPins")
+	desc.addElement(elem)
+
+	arr = DescriptorElementArrayClass("BaSourceID", "bNrInputPins")
+	arr.arrayLength = "given"
+	arr.arrayLengthField = "bNrInputPins"
+	arr.arrayMemberType = "link"
+	arr.arrayMemberLinkType = "MIDIID"
+	arr.arrayMemberSize = 1
+	desc.addElementArray(arr)
+
+	elem = DescriptorElementClass(elementType = "link", size = 1, name = "iJack")
+	elem.linkType = "stringIndex"
+	desc.addElement(elem)
+
+	desc.descriptiveString = "iJack"
+
+	return desc
+
+def createMIDIEndpointDescriptor():
+	desc = DescriptorClass("MIDIEndpointDescriptor")
+	desc.allowedParents.append("InterfaceDescriptor")
+
+	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
+	elem.autoMethod = "descriptorSize"
+	elem.comment = "Size of this descriptor in bytes"
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
+	elem.value = 0x25
+	elem.comment = "CS_ENDPOINT"
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorSubtype")
+	elem.value = 0x01
+	elem.comment = "MS_GENERAL"
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bNumEmbMIDIJack")
+	desc.addElement(elem)
+
+	arr = DescriptorElementArrayClass("baAssocJackID", "bNumEmbMIDIJack")
+	arr.arrayLength = "given"
+	arr.arrayLengthField = "bNumEmbMIDIJack"
+	arr.arrayMemberType = "link"
+	arr.arrayMemberLinkType = "MIDIID"
+	arr.arrayMemberSize = 1
+	desc.addElementArray(arr)
+
+	return desc
+
 def createTemplates():
 	templates = []
 
@@ -1089,5 +1274,11 @@ def createTemplates():
 	templates.append(createUAC2ClockSelectorUnitDescriptorTemplate())
 	templates.append(createUAC2ClockMultiplierDescriptorTemplate())
 	templates.append(createUAC2SamplingRateConverterUnitDescriptorTemplate())
+
+	templates.append(createAudioControlHeaderDescriptor())
+	templates.append(createMIDIStreamingHeaderDescriptor())
+	templates.append(createMIDIInJackDescriptor())
+	templates.append(createMIDIOutJackDescriptor())
+	templates.append(createMIDIEndpointDescriptor())
 
 	return templates
