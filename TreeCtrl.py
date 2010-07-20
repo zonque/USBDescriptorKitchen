@@ -99,10 +99,10 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		self.Expand(item)
 
 		for c in newdescriptor.children:
-			print "child ..."
 			self.AddDescriptor(c, item)
 
-		parent.append(newdescriptor)
+		if not newdescriptor in parent:
+			parent.append(newdescriptor)
 
 		if selectedDescriptor:
 			selectedDescriptor.handleAutoFields()
@@ -191,25 +191,6 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
 			item = self.GetNext(item)
 
-	def OnItemFont(self, event):
-		data = wx.FontData()
-		font = self.itemdict["font"]
-
-		if font is None:
-			font = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
-
-		data.SetInitialFont(font)
-
-		dlg = wx.FontDialog(self, data)
-
-		if dlg.ShowModal() == wx.ID_OK:
-			data = dlg.GetFontData()
-			font = data.GetChosenFont()
-			self.SetItemFont(self.current, font)
-
-		dlg.Destroy()
-
-
 	def OnSelChanged(self, event):
 		for d in self.descriptors:
 			d.handleAutoFields()
@@ -226,25 +207,52 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 			event.Allow()
 
 	def OnEndDrag(self, event):
-		newroot = event.GetItem()
+		item = self.item
+		destination = event.GetItem()
+		parent = item.GetParent()
+		
+		descriptor = self.GetPyData(item)
+		destinationDescriptor = self.GetPyData(destination)
+		parentDescriptor = self.GetPyData(parent)
+		
+		if destinationDescriptor:
+			destinationType = destinationDescriptor.descriptorType
+		else:
+			destinationType = "Root"
 
-		descriptor = self.GetPyData(self.item)
+		if parentDescriptor:
+			parentList = parentDescriptor.children
+		else:
+			parentList = self.descriptors
 
-		oldParent = self.item.GetParent()
-		oldParentDescriptor = self.GetPyData(oldParent)
+		if destinationType in descriptor.allowedParents:
+			foo = copy.deepcopy(descriptor)
+			foo.debugDump()
+			
+			self.Delete(item)
+			#self.item = None
+			parentList.remove(descriptor)
 
-		newParentDescriptor = self.GetPyData(newroot)
+			self.AddDescriptor(foo, destination)
 
-		if self.AddDescriptor(copy.deepcopy(descriptor), newroot):
-			if oldParentDescriptor:
-				oldParentDescriptor.children.remove(descriptor)
-			else:
-				self.descriptors.remove(descriptor)
+		else:
+			idx = 0
+			for c in parentList:
+				if c == destinationDescriptor:
+					break
+				idx += 1
+			
+			parentList.remove(descriptor)
+			parentList.insert(idx, descriptor)
 
-			self.Delete(self.item)
-			self.item = None
+			self.Delete(item)
+			item = self.InsertItemByIndex(parent, idx, descriptor.getSummaryName())
+			self.SetPyData(item, descriptor)
+			
+			self.item = item
 
 		event.Skip()
+		return
 
 	def RemoveSelectedDescriptor(self):
 		if not self.item:
@@ -270,4 +278,3 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		self.BuildTree()
 		self.item = None
 		self.descriptorDetailPanel.SetDescriptor(None)
-

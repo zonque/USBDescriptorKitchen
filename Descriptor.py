@@ -427,3 +427,15 @@ class DescriptorClass:
 		for c in self.children:
 			c.dumpC(indent)
 
+	def debugDump(self, indent=""):
+		print indent,
+		print self
+		print indent,
+		print self.descriptorType
+		
+		for e in self.elements:
+			print indent + "element %s" % e.name
+		
+		indent += "  "
+		for c in self.children:
+			c.debugDump(indent)

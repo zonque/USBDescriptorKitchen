@@ -528,7 +528,7 @@ def createInterfaceAssociationDescriptorTemplate():
 
 def createDFUFunctionDescriptorTemplate():
 	desc = DescriptorClass("DFUFunctionalDescriptor")
-	desc.allowedParents.append("ConfigurationDescriptor")
+	desc.allowedParents.append("InterfaceDescriptor")
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
 	elem.autoMethod = "descriptorSize"
@@ -805,7 +805,6 @@ def createUAC2MixerUnitDescriptorTemplate():
 def createUAC2SelectorUnitDescriptorTemplate():
 	desc = DescriptorClass("UAC2SelectorUnitDescriptor")
 	desc.allowedParents.append("InterfaceDescriptor")
-	desc.allowedParents.append("Root")
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
 	elem.autoMethod = "descriptorSize"
@@ -848,7 +847,6 @@ def createUAC2SelectorUnitDescriptorTemplate():
 def createUAC2FeatureUnitDescriptorTemplate():
 	desc = DescriptorClass("UAC2FeatureUnitDescriptor")
 	desc.allowedParents.append("InterfaceDescriptor")
-	desc.allowedParents.append("Root")
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
 	elem.autoMethod = "descriptorSize"
@@ -951,7 +949,6 @@ def createUAC2ClockSourceDescriptorTemplate():
 def createUAC2ClockSelectorUnitDescriptorTemplate():
 	desc = DescriptorClass("UAC2ClockSelectorUnitDescriptor")
 	desc.allowedParents.append("InterfaceDescriptor")
-	desc.allowedParents.append("Root")
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
 	elem.autoMethod = "descriptorSize"
@@ -1032,7 +1029,6 @@ def createUAC2ClockMultiplierDescriptorTemplate():
 def createUAC2SamplingRateConverterUnitDescriptorTemplate():
 	desc = DescriptorClass("UAC2SamplingRateConverterUnitDescriptor")
 	desc.allowedParents.append("InterfaceDescriptor")
-	desc.allowedParents.append("Root")
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
 	elem.autoMethod = "descriptorSize"
@@ -1095,4 +1091,3 @@ def createTemplates():
 	templates.append(createUAC2SamplingRateConverterUnitDescriptorTemplate())
 
 	return templates
-
