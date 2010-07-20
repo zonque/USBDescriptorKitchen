@@ -326,13 +326,13 @@ def createStringDescriptorZeroTemplate():
 	elem.comment = "STRING Descriptor Type"
 	desc.addElement(elem)
 
-	elem = DescriptorElementArrayClass("wLANGID", "bDescriptorType")
-	elem.arrayLength = "dynamic"
-	elem.arrayMemberType = "enum"
-	elem.arrayMemberSize = 2
-	elem.enum = langids
-	elem.defaultValue = 0x407
-	desc.addElementArray(elem)
+	arr = DescriptorElementArrayClass("bDescriptorType")
+	arr.arrayLength = "dynamic"
+	member = DescriptorElementArrayMemberClass(memberType = "enum", size = 2, name = "wLANGID")
+	member.enum = langids
+	member.value = 0x407
+	arr.appendMember(member)
+	desc.addElementArray(arr)
 
 	return desc
 
@@ -831,12 +831,12 @@ def createUAC2SelectorUnitDescriptorTemplate():
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bNrInPins")
 	desc.addElement(elem)
 
-	elem = DescriptorElementArrayClass("baSourceID", "bNrInPins")
-	elem.arrayLength = "given"
-	elem.arrayLengthField = "bNrInPins"
-	elem.arrayMemberType = "variable"
-	elem.arrayMemberSize = 1
-	desc.addElementArray(elem)
+	arr = DescriptorElementArrayClass("bNrInPins")
+	arr.arrayLength = "given"
+	arr.arrayLengthField = "bNrInPins"
+	member = DescriptorElementArrayMemberClass(memberType = "variable", size = 1, name = "baSourceID")
+	arr.appendMember(member)
+	desc.addElementArray(arr)
 
 	elem = DescriptorElementClass(elementType = "bitmap", size = 4, name = "bmControls")
 	elem.appendBitmap(createUACbmControls("Selector Control", 0))
@@ -874,25 +874,26 @@ def createUAC2FeatureUnitDescriptorTemplate():
 	elem.linkType = "UAC2Unit"
 	desc.addElement(elem)
 
-	arr = DescriptorElementArrayClass("bmaControls", "bSourceID")
-	arr.arrayLength = "dynamic"
-	arr.arrayMemberType = "bitmap"
-	arr.arrayMemberSize = 4
-	arr.appendBitmap(createUACbmControls("Mute Control", 0))
-	arr.appendBitmap(createUACbmControls("Volume Control", 2))
-	arr.appendBitmap(createUACbmControls("Bass Control", 4))
-	arr.appendBitmap(createUACbmControls("Mid Control", 6))
-	arr.appendBitmap(createUACbmControls("Treble Control", 8))
-	arr.appendBitmap(createUACbmControls("Graphic Equalizer Control", 10))
-	arr.appendBitmap(createUACbmControls("Automatic Gain Control", 12))
-	arr.appendBitmap(createUACbmControls("Delay Control", 14))
-	arr.appendBitmap(createUACbmControls("Bass Boost Control", 16))
-	arr.appendBitmap(createUACbmControls("Loudness Control", 18))
-	arr.appendBitmap(createUACbmControls("Input Gain Control", 20))
-	arr.appendBitmap(createUACbmControls("Input Gain Pad Control", 22))
-	arr.appendBitmap(createUACbmControls("Phase Inverter Control", 24))
-	arr.appendBitmap(createUACbmControls("Underflow Control", 26))
-	arr.appendBitmap(createUACbmControls("Overfow Control", 28))
+	arr = DescriptorElementArrayClass("bNrInPins")
+	arr.arrayLength = "given"
+	arr.arrayLengthField = "bNrInPins"
+	member = DescriptorElementArrayMemberClass(memberType = "bitmap", size = 4, name = "bmaControls")
+	member.appendBitmap(createUACbmControls("Mute Control", 0))
+	member.appendBitmap(createUACbmControls("Volume Control", 2))
+	member.appendBitmap(createUACbmControls("Bass Control", 4))
+	member.appendBitmap(createUACbmControls("Mid Control", 6))
+	member.appendBitmap(createUACbmControls("Treble Control", 8))
+	member.appendBitmap(createUACbmControls("Graphic Equalizer Control", 10))
+	member.appendBitmap(createUACbmControls("Automatic Gain Control", 12))
+	member.appendBitmap(createUACbmControls("Delay Control", 14))
+	member.appendBitmap(createUACbmControls("Bass Boost Control", 16))
+	member.appendBitmap(createUACbmControls("Loudness Control", 18))
+	member.appendBitmap(createUACbmControls("Input Gain Control", 20))
+	member.appendBitmap(createUACbmControls("Input Gain Pad Control", 22))
+	member.appendBitmap(createUACbmControls("Phase Inverter Control", 24))
+	member.appendBitmap(createUACbmControls("Underflow Control", 26))
+	member.appendBitmap(createUACbmControls("Overfow Control", 28))
+	arr.appendMember(member)
 	desc.addElementArray(arr)
 
 	elem = DescriptorElementClass(elementType = "link", size = 1, name = "iFeature")
@@ -976,12 +977,12 @@ def createUAC2ClockSelectorUnitDescriptorTemplate():
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bNrInPins")
 	desc.addElement(elem)
 
-	arr = DescriptorElementArrayClass("baCSourceID", "bNrInPins")
+	arr = DescriptorElementArrayClass("bNrInPins")
 	arr.arrayLength = "given"
 	arr.arrayLengthField = "bNrInPins"
-	arr.arrayMemberType = "link"
-	arr.arrayMemberLinkType = "UAC2Clock"
-	arr.arrayMemberSize = 1
+	member = DescriptorElementArrayMemberClass(memberType = "link", size = 1, name = "baCSourceID")
+	member.linkType = "UAC2Clock"
+	arr.appendMember(member)
 	desc.addElementArray(arr)
 
 	elem = DescriptorElementClass(elementType = "bitmap", size = 4, name = "bmControls")
@@ -1102,11 +1103,12 @@ def createAudioControlHeaderDescriptor():
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bInCollection")
 	desc.addElement(elem)
 
-	arr = DescriptorElementArrayClass("baInterfaceNr", "bInCollection")
+	arr = DescriptorElementArrayClass("bInCollection")
 	arr.arrayLength = "given"
 	arr.arrayLengthField = "bInCollection"
-	arr.arrayMemberType = "variable"
-	arr.arrayMemberSize = 1
+	
+	member = DescriptorElementArrayMemberClass(memberType = "variable", size = 1, name = "baInterfaceNr")
+	arr.appendMember(member)
 	desc.addElementArray(arr)
 
 	return desc
@@ -1203,12 +1205,12 @@ def createMIDIOutJackDescriptor():
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bNrInputPins")
 	desc.addElement(elem)
 
-	arr = DescriptorElementArrayClass("BaSourceID", "bNrInputPins")
+	arr = DescriptorElementArrayClass("bNrInputPins")
 	arr.arrayLength = "given"
-	arr.arrayLengthField = "bNrInputPins"
-	arr.arrayMemberType = "link"
-	arr.arrayMemberLinkType = "MIDIID"
-	arr.arrayMemberSize = 1
+	arr.arrayLengthField = "bNrInputPins"	
+	member = DescriptorElementArrayMemberClass(memberType = "link", size = 1, name = "BaSourceID")
+	member.linkType = "MIDIID"
+	arr.appendMember(member)
 	desc.addElementArray(arr)
 
 	elem = DescriptorElementClass(elementType = "link", size = 1, name = "iJack")
@@ -1241,12 +1243,51 @@ def createMIDIEndpointDescriptor():
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bNumEmbMIDIJack")
 	desc.addElement(elem)
 
-	arr = DescriptorElementArrayClass("baAssocJackID", "bNumEmbMIDIJack")
+	arr = DescriptorElementArrayClass("bNumEmbMIDIJack")
 	arr.arrayLength = "given"
-	arr.arrayLengthField = "bNumEmbMIDIJack"
-	arr.arrayMemberType = "link"
-	arr.arrayMemberLinkType = "MIDIID"
-	arr.arrayMemberSize = 1
+	arr.arrayLengthField = "bNumEmbMIDIJack"	
+	member = DescriptorElementArrayMemberClass(memberType = "link", size = 1, name = "baAssocJackID")
+	member.linkType = "MIDIID"
+	arr.appendMember(member)
+	desc.addElementArray(arr)
+
+	return desc
+
+def createHIDDescriptor():
+	desc = DescriptorClass("HIDDescriptor")
+	desc.allowedParents.append("InterfaceDescriptor")
+
+	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
+	elem.autoMethod = "descriptorSize"
+	elem.comment = "Size of this descriptor in bytes"
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
+	elem.value = 0x21
+	elem.comment = "HID"
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "constant", size = 2, name = "bcdHID")
+	elem.value = 0x101
+	elem.comment = "1.1"
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bCountryCode")
+	desc.addElement(elem)
+
+	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bNumDescriptors")
+	desc.addElement(elem)
+
+	arr = DescriptorElementArrayClass("bNumDescriptors")
+	arr.arrayLength = "given"
+	arr.arrayLengthField = "bNumDescriptors"
+
+	member = DescriptorElementArrayMemberClass(memberType = "constant", size = 1, name = "bDescriptorType")
+	member.value = 0x22
+	arr.appendMember(member)
+
+	member = DescriptorElementArrayMemberClass(memberType = "variable", size = 2, name = "wDescriptorLength")
+	arr.appendMember(member)
 	desc.addElementArray(arr)
 
 	return desc
@@ -1280,5 +1321,7 @@ def createTemplates():
 	templates.append(createMIDIInJackDescriptor())
 	templates.append(createMIDIOutJackDescriptor())
 	templates.append(createMIDIEndpointDescriptor())
+
+	templates.append(createHIDDescriptor())
 
 	return templates

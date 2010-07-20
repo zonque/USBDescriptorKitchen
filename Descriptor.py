@@ -1,17 +1,27 @@
 import copy
 
-class DescriptorElementArrayClass:
-	def __init__(self, name, after):
-		self.name = name
-		self.after = after
-		self.numEntries = 1
+class DescriptorElementArrayMemberClass:
+	def __init__(self, memberType, size, name):
 		self.bitmap = []
 		self.enum = []
-		self.arrayMemberLinkType = ""
-		self.defaultValue = 0
+		self.name = name
+		self.memberType = memberType
+		self.size = size
+		self.linkType = ""
+		self.value = 0
+		self.comment = ""
 
 	def appendBitmap(self, bitmap):
 		self.bitmap.append(bitmap)
+
+class DescriptorElementArrayClass:
+	def __init__(self, after):
+		self.after = after
+		self.numEntries = 1
+		self.members = []
+
+	def appendMember(self, member):
+		self.members.append(member)
 
 class DescriptorElementClass:
 	def __init__(self, elementType = "UNKNOWN", size = 0, name = ""):
@@ -274,8 +284,9 @@ class DescriptorClass:
 			if a.arrayLength != "dynamic":
 				continue
 
-			if elem.name[:len(a.name)] == a.name:
-				a.numEntries += 1
+			for member in a.members:
+				if elem.name[:len(member.name)] == member.name:
+					a.numEntries += 1
 
 		self.handleAutoFields()
 
@@ -304,9 +315,10 @@ class DescriptorClass:
 			elements = self.elements[:]
 
 			for e in elements:
-				if e.createdByArray and e.name[:len(a.name)] == a.name:
-					savedValues.append(e.value)
-					self.elements.remove(e)
+				for member in a.members:
+					if e.createdByArray and e.name[:len(member.name)] == member.name:
+						savedValues.append(e.value)
+						self.elements.remove(e)
 
 			if a.arrayLength == "given":
 				num = self.getValue(a.arrayLengthField)
@@ -320,25 +332,28 @@ class DescriptorClass:
 			for e in elements:
 				if e.name == a.after:
 					for i in range(num):
-						name = "%s(%d)" % (a.name, i)
-						elem = DescriptorElementClass(elementType = a.arrayMemberType, size = a.arrayMemberSize, name = name)
-						elem.createdByArray = True
-						elem.linkType = a.arrayMemberLinkType
-						elem.enum = a.enum
+						for member in a.members:
+							name = "%s(%d)" % (member.name, i)
+							elem = DescriptorElementClass(elementType = member.memberType, size = member.size, name = name)
+							elem.createdByArray = True
+							elem.linkType = member.linkType
+							elem.enum = member.enum
+							elem.comment = member.comment
 
-						for b in a.bitmap:
-							bitmap = copy.deepcopy(b)
-							bitmap.parentElement = self
-							elem.appendBitmap(bitmap)
+							for b in member.bitmap:
+								bitmap = copy.deepcopy(b)
+								bitmap.parentElement = self
+								elem.appendBitmap(bitmap)
 
-						# try to restore former values
-						try:
-							elem.value = savedValues[i]
-						except:
-							elem.value = a.defaultValue
+							# try to restore former values
+							try:
+								elem.value = savedValues.pop(0)
+							except:
+								#raise
+								elem.value = member.value
 
-						self.elements.insert(idx  + 1, elem)
-						idx += 1
+							self.elements.insert(idx  + 1, elem)
+							idx += 1
 
 					break
 
