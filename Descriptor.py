@@ -198,6 +198,10 @@ class DescriptorElementClass:
 	def appendBitmap(self, bitmap):
 		bitmap.parentElement = self
 		self.bitmap.append(bitmap)
+		
+	def updateBitmap(self):
+		for b in self.bitmap:
+			b.value = (self.value >> b.offset) & ((1 << b.size) - 1)
 
 class DescriptorClass:
 	def __init__(self, descriptorType = "", comment = ""):
@@ -360,15 +364,16 @@ class DescriptorClass:
 				idx += 1
 
 	def handleAutoFields(self):
-
 		self.handleArrays()
 
 		idx = 0
 		for c in self.children:
 			c.handleAutoFields()
 			idx += 1
-
+			
 		for e in self.elements:
+			e.updateBitmap()
+		
 			if e.elementType != "auto":
 				continue
 

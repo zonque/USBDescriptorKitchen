@@ -18,7 +18,7 @@ def reconstructFields(desc, array):
 	idx = 0
 
 	# now copy over all non-constant elements
-	for e in desc.elements:
+	for e in desc.elements:	
 		if e.elementType == "constant" or \
 		   e.elementType == "auto":
 			idx += e.size
@@ -34,18 +34,17 @@ def reconstructFields(desc, array):
 					e.strValue += "%c" % int(array[idx + i], 16)
 		else:
 			for n in range(e.size):
-				e.value |= int(array[idx], 16) << ((e.size - n - 1) * 8)
-				print "element %s val %d" % (e.name, e.value)
+				e.value |= int(array[idx], 16) << (n * 8)
+				#print "element %s val %d" % (e.name, e.value)
 				idx += 1
 
 def reconstructDescriptor(array, descriptorTemplates, state, parentList):
 	idx = 0
-	desc = None
 	l = []
 
 	while idx < len(array):
 		length = int(array[idx], 16)
-		idx += length
+		print "len %d" % length
 
 		for t in descriptorTemplates:
 			off = 0
@@ -54,7 +53,7 @@ def reconstructDescriptor(array, descriptorTemplates, state, parentList):
 			# test if all constant elements in the template descriptor match
 			for e in t.elements:
 				if (off >= len(array)) or \
-				   (e.elementType == "constant" and e.value != int(array[off], 16)):
+				   (e.elementType == "constant" and e.value != int(array[idx+off], 16)):
 					matched = False
 
 				off += e.size
@@ -71,16 +70,19 @@ def reconstructDescriptor(array, descriptorTemplates, state, parentList):
 
 			desc = copy.deepcopy(t)
 			desc.setParentList(parentList)
+			print "desc type: %s" % desc.descriptorType
 
 			# reconstruct fields once
-			reconstructFields(desc, array)
+			reconstructFields(desc, array[idx:])
 			desc.handleAutoFields()
 
 			# reconstruct fields again after the auto fields have been set
-			reconstructFields(desc, array)
+			reconstructFields(desc, array[idx:])
 
-		if desc:
 			l.append(desc)
+			break
+
+		idx += length
 
 	return l
 
