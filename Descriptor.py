@@ -161,31 +161,32 @@ class DescriptorElementClass:
 		return s
 
 	def dumpC(self, indent = ""):
-		print indent ,
+		out = indent
 		dump = self.dumpHex(indent)
 		padding = ' ' * (30 - len(indent) - len(dump))
-		print "%s%s/* %s" % (dump, padding, self.name) ,
+		out += "%s%s/* %s" % (dump, padding, self.name)
 
 		if self.comment != "":
-			print "(%s) " % self.comment ,
+			out += "(%s) " % self.comment
 
 		if self.elementType == "enum":
-			print "(\"%s\") " % self.getEnumKey() ,
+			out += "(\"%s\") " % self.getEnumKey()
 
 		if self.elementType == "bitmap":
-			print "(" ,
+			out += "("
 			first = 1
 			for b in self.bitmap:
 				if not first:
-					print ", " ,
+					out += ", "
 				first = 0
-				print "'%s' = %d" % (b.name, b.value) ,
-			print ")" ,
+				out += "'%s' = %d" % (b.name, b.value)
+			out += ")"
 
 		if self.size > 1:
-			print "(%d) " % self.value ,
+			out += "(%d) " % self.value
 
-		print "*/"
+		out += "*/\n"
+		return out
 
 	def updateSize(self):
 		if self.elementType == "string":
@@ -197,7 +198,7 @@ class DescriptorElementClass:
 	def appendBitmap(self, bitmap):
 		bitmap.parentElement = self
 		self.bitmap.append(bitmap)
-		
+
 	def updateBitmap(self):
 		for b in self.bitmap:
 			b.value = (self.value >> b.offset) & ((1 << b.size) - 1)
@@ -376,10 +377,10 @@ class DescriptorClass:
 		for c in self.children:
 			c.handleAutoFields()
 			idx += 1
-			
+
 		for e in self.elements:
 			e.updateBitmap()
-		
+
 			if e.elementType != "auto":
 				continue
 
@@ -449,28 +450,30 @@ class DescriptorClass:
 
 		indent += "  "
 
-		print indent ,
-		print "/* %s" % self.descriptorType ,
+		out = indent
+		out += "/* %s" % self.descriptorType
 		if self.comment != "":
-			print " (%s)" % self.comment,
-		print "*/"
+			out += " (%s)" % self.comment
+		out += "*/\n"
 
 		for e in self.elements:
-			e.dumpC(indent)
+			out += e.dumpC(indent)
 
 		for c in self.children:
-			c.dumpC(indent)
+			out += c.dumpC(indent)
+
+		return out
 
 	def debugDump(self, indent=""):
 		print indent,
 		print self
 		print indent,
 		print self.descriptorType
-		
+
 		for e in self.elements:
 			print indent + "element %s" % e.name
 			print indent + "value %d" % e.value
-		
+
 		indent += "  "
 		for c in self.children:
 			c.debugDump(indent)
