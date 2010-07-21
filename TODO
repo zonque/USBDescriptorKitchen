@@ -1,4 +1,3 @@
 - implement sanity check framework
 - implement UAC2 mixer unit (will need some quirks)
-- implement proper export to file
 

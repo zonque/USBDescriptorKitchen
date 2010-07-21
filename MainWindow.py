@@ -127,6 +127,7 @@ class MainFrame(wx.Frame):
 			paths = dlg.GetPaths()
 			self.filename = paths[0]
 
+			self.tree.RemoveAllDescriptors()
 			for d in DescriptorParser.parseDescriptorFromFile(paths[0], self.templates):
 				#print d
 				self.tree.AddDescriptor(d)

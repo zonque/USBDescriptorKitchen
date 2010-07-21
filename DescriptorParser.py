@@ -31,58 +31,95 @@ def reconstructFields(desc, array):
 			for i in range(len(array) - idx):
 				# only copy over every second byte (unicode)
 				if not (i % 2):
-					e.strValue += "%c" % int(array[idx + i], 16)
+					e.strValue += "%c" % array[idx + i]
 		else:
 			for n in range(e.size):
-				e.value |= int(array[idx], 16) << (n * 8)
+				e.value |= array[idx + n] << (n * 8)
 				#print "element %s val %d" % (e.name, e.value)
-				idx += 1
+
+		idx += e.size
 
 def reconstructDescriptor(array, descriptorTemplates, state, parentList):
+	desc = None
+
+	for t in descriptorTemplates:
+		off = 0
+		matched = True
+
+		# test if all constant elements in the template descriptor match
+		for e in t.elements:
+			if (off + e.size > len(array)):
+				matched = False
+				off += e.size
+				break
+
+			v = 0
+			for n in range(e.size):
+				v |= array[off + n] << (n * 8)
+
+			if e.elementType == "constant" and e.value != v:
+				matched = False
+
+			if e.elementType == "enum":
+				enumvals = []
+				for (name, enumval) in e.enum.items():
+					enumvals.append(int(enumval))
+
+				#print enumvals
+
+				if not v in enumvals:
+					matched = False
+
+			off += e.size
+
+		if not matched:
+			continue
+
+		# quirks for string descriptors - a StringDescriptorZero must always come first
+		if t.descriptorType == "StringDescriptorZero":
+			if "stringDescriptorZeroSeen" in state:
+				continue
+
+			state.append("stringDescriptorZeroSeen")
+
+		desc = copy.deepcopy(t)
+		desc.setParentList(parentList)
+
+		# reconstruct fields once
+		reconstructFields(desc, array)
+		desc.handleAutoFields()
+
+		# reconstruct fields again after the auto fields have been set
+		reconstructFields(desc, array)
+
+		return desc
+
+	return None
+
+
+def reconstructDescriptors(array, descriptorTemplates, state, parentList):
 	idx = 0
 	l = []
 
 	while idx < len(array):
 		length = int(array[idx], 16)
-		print "len %d" % length
 
-		for t in descriptorTemplates:
-			off = 0
-			matched = True
+		if length == 0:
+			print "bogus descriptors"
+			return []
 
-			# test if all constant elements in the template descriptor match
-			for e in t.elements:
-				if (off >= len(array)) or \
-				   (e.elementType == "constant" and e.value != int(array[idx+off], 16)):
-					matched = False
-
-				off += e.size
-
-			if not matched:
-				continue
-
-			# quirks for string descriptors - a StringDescriptorZero must always come first
-			if t.descriptorType == "StringDescriptorZero":
-				if "stringDescriptorZeroSeen" in state:
-					continue
-
-				state.append("stringDescriptorZeroSeen")
-
-			desc = copy.deepcopy(t)
-			desc.setParentList(parentList)
-			print "desc type: %s" % desc.descriptorType
-
-			# reconstruct fields once
-			reconstructFields(desc, array[idx:])
-			desc.handleAutoFields()
-
-			# reconstruct fields again after the auto fields have been set
-			reconstructFields(desc, array[idx:])
-
-			l.append(desc)
-			break
+		subarray = []
+		for b in array[idx:idx+length]:
+			subarray.append(int(b, 16))
 
 		idx += length
+
+		d = reconstructDescriptor(subarray, descriptorTemplates, state, parentList)
+		if d:
+			l.append(d)
+		else:
+			print "Unable to parse descriptor(s) from array: "
+			print subarray
 
 	return l
 
@@ -91,11 +128,11 @@ def parseDescriptorFromFile(filename, descriptorTemplates):
 	s = f.read()
 
 	s = commentRemover(s)
-	
+
 	strings = re.split("\n", s)
-	
+
 	desc = None
-	bytearray = []
+	array = []
 	runningindent = -1
 	rootList = []
 	parentList = rootList
@@ -116,17 +153,14 @@ def parseDescriptorFromFile(filename, descriptorTemplates):
 		if runningindent == -1:
 			runningindent = indent
 
-		if indent != runningindent:			
-			if len(bytearray):
-				descList = reconstructDescriptor(bytearray, descriptorTemplates, state, parentList)
-				
-				if not descList:
-					print "Unable to parse descriptor(s) from array: "
-					print bytearray
-					bytearray = []
+		if indent != runningindent:
+			if len(array):
+				descList = reconstructDescriptors(array, descriptorTemplates, state, parentList)
+
+				if len(descList) == 0:
 					continue
 
-				bytearray = []
+				array = []
 
 				if (indent < runningindent):
 					if len(stack):
@@ -135,11 +169,12 @@ def parseDescriptorFromFile(filename, descriptorTemplates):
 							if st["indent"] == indent:
 								break
 					else:
-						print "ROOT"
 						parentList = rootList
 
-				for desc in descList:
-					parentList.append(desc)
+				for d in descList:
+					parentList.append(d)
+					desc = d
+					print d
 
 				if (indent > runningindent):
 					stack.append({ "list": parentList, "indent": runningindent})
@@ -147,7 +182,7 @@ def parseDescriptorFromFile(filename, descriptorTemplates):
 
 		runningindent = indent
 
-		bytearray += re.findall("(0x[0-9a-fA-F][0-9a-fA-F])", s)
+		array += re.findall("(0x[0-9a-fA-F][0-9a-fA-F])", s)
 
 	f.close()
 

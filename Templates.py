@@ -602,7 +602,7 @@ def createUAC2InterfaceHeaderDescriptor():
 	elem.value = 1
 	desc.addElement(elem)
 
-	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bcdADC")
+	elem = DescriptorElementClass(elementType = "constant", size = 2, name = "bcdADC")
 	elem.value = 0x200
 	desc.addElement(elem)
 
