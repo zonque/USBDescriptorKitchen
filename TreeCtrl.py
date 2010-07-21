@@ -24,7 +24,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		self.Bind(wx.EVT_TREE_ITEM_RIGHT_CLICK, self.OnItemMenu)
 
 		descriptorDetailPanel.setDescriptorList(self)
-
+	
 	def OnItemMenu(self, event):
 		# ignore right click other than on selection
 		if self.GetSelection() != event.GetItem():
@@ -138,13 +138,13 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
 	def findDescriptorsWithFieldRecursive(self, desc, fields, typeConstraint, descriptorList):
 		matched = False
-		
+
 		if desc.descriptorType[:len(typeConstraint)] == typeConstraint:
 			for field in fields:
 				if desc.hasField(field):
 					value = desc.getValue(field)
 					matched = True
-					
+
 		if matched:
 			#print "matched: %s v %d" % (desc.descriptorType, value)
 			descriptorList.append((desc, value))
@@ -183,7 +183,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		descriptorList = []
 
 		# traverse up to the configuration descriptor
-		configDescriptor = descriptor.iterateUp("ConfigurationDescriptor")
+		configDescriptor = descriptor.iterateUp("Configuration")
 		if not configDescriptor:
 			print "Oops - no config descriptor?"
 			return {}
@@ -206,7 +206,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 			# and then subtract those which are already taken
 			for desc in configDescriptor.children:
 				self.findDescriptorsWithFieldRecursive(desc, ["bUnitID", "bTerminalID"], "UAC2", descriptorList)
-	
+
 		if element.suggestionType == "UAC2Clock":
 			# first add all possible values
 			for i in range(255):
@@ -228,10 +228,10 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		for (desc, value) in descriptorList:
 			if value in valueList:
 				valueList.remove(value)
-				
+
 		for i in valueList:
 			resultList[str(i)] = i
-				
+
 		return resultList
 
 	def BuildTree(self):
@@ -282,11 +282,11 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		item = self.item
 		destination = event.GetItem()
 		parent = item.GetParent()
-		
+
 		descriptor = self.GetPyData(item)
 		destinationDescriptor = self.GetPyData(destination)
 		parentDescriptor = self.GetPyData(parent)
-		
+
 		if destinationDescriptor:
 			destinationType = destinationDescriptor.descriptorType
 		else:
@@ -300,7 +300,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		if destinationType in descriptor.allowedParents:
 			foo = copy.deepcopy(descriptor)
 			foo.debugDump()
-			
+
 			self.Delete(item)
 			#self.item = None
 			parentList.remove(descriptor)
@@ -313,14 +313,14 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 				if c == destinationDescriptor:
 					break
 				idx += 1
-			
+
 			parentList.remove(descriptor)
 			parentList.insert(idx, descriptor)
 
 			self.Delete(item)
 			item = self.InsertItemByIndex(parent, idx, descriptor.getSummaryName())
 			self.SetPyData(item, descriptor)
-			
+
 			self.item = item
 
 		event.Skip()
