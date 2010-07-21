@@ -157,7 +157,8 @@ def createInterfaceClassCodes(name):
 			"Defined at interface level": 0,
 			"Audio": 1, "Conn": 2, "HID": 3, "Pysical": 4, "Still Image": 5, "Printer": 6,
 			"Mass Storage": 7, "HUB": 8, "CDC Data": 9, "CSCID": 0xa, "Content Sec": 0xb,
-			"Video": 0xd, "Misc": 0xe, "App Specific": 0xef, "Vendor specific": 0xff
+			"Video": 0xd, "Misc": 0xe, "Wireless Controller": 0xe0,
+			"App Specific": 0xef, "Vendor specific": 0xff
 			}
 	return elem
 
