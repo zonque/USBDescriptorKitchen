@@ -416,13 +416,13 @@ class DescriptorClass:
 	def getSummaryName(self):
 		name = self.descriptorType
 
-		if name == "ConfigurationDescriptor":
+		if name == "Configuration":
 			for e in self.elements:
 				if e.name == "bConfigurationValue":
 					val = e.value
 			name += " (#%d)" % val
 
-		if name == "InterfaceDescriptor":
+		if name == "Interface":
 			for e in self.elements:
 				if e.name == "bInterfaceNumber":
 					idx = e.value
@@ -430,13 +430,13 @@ class DescriptorClass:
 					alt = e.value
 			name += " (#%d, alt %d)" % (idx, alt)
 
-		if name == "EndpointDescriptor":
+		if name == "Endpoint":
 			for e in self.elements:
 				if e.name == "bEndpointAddress":
 					addr = e.value
 			name += " (0x%02x)" % addr
 
-		if name == "StringDescriptor":
+		if name == "String":
 			for e in self.elements:
 				if e.name == "bString":
 					v = e.strValue

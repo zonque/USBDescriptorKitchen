@@ -783,7 +783,8 @@ def createUAC2SelectorUnitDescriptor():
 	arr = DescriptorElementArrayClass("bNrInPins")
 	arr.arrayLength = "given"
 	arr.arrayLengthField = "bNrInPins"
-	member = DescriptorElementArrayMemberClass(memberType = "variable", size = 1, name = "baSourceID")
+	member = DescriptorElementArrayMemberClass(memberType = "link", size = 1, name = "baSourceID")
+	member.linkType = "UAC2Unit"
 	arr.appendMember(member)
 	desc.addElementArray(arr)
 
@@ -919,6 +920,7 @@ def createUAC2ClockSelectorUnitDescriptor():
 	arr.arrayLengthField = "bNrInPins"
 	member = DescriptorElementArrayMemberClass(memberType = "link", size = 1, name = "baCSourceID")
 	member.linkType = "UAC2Clock"
+	print "memberType %s" % member.memberType
 	arr.appendMember(member)
 	desc.addElementArray(arr)
 

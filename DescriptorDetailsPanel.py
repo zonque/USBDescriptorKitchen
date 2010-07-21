@@ -84,13 +84,13 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 			return self.descriptorList.getStringDescriptors()
 
 		if element.linkType == "UAC2Unit":
-			return self.descriptorList.findDescriptorsWithField("bUnitID", "UAC2")
+			return self.descriptorList.findDescriptorsWithFields(["bUnitID", "bTerminalID"], "UAC2")
 
 		if element.linkType == "UAC2Clock":
-			return self.descriptorList.findDescriptorsWithField("bClockID", "UAC2")
+			return self.descriptorList.findDescriptorsWithFields(["bClockID"], "UAC2")
 
 		if element.linkType == "MIDIID":
-			return self.descriptorList.findDescriptorsWithField("bJackID", "MIDI")
+			return self.descriptorList.findDescriptorsWithFields(["bJackID"], "MIDI")
 
 		print "Missing implementation for link type %s" % element.linkType
 

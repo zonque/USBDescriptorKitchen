@@ -24,7 +24,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		self.Bind(wx.EVT_TREE_ITEM_RIGHT_CLICK, self.OnItemMenu)
 
 		descriptorDetailPanel.setDescriptorList(self)
-	
+
 	def OnItemMenu(self, event):
 		# ignore right click other than on selection
 		if self.GetSelection() != event.GetItem():
@@ -117,7 +117,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		l = {}
 		idx = 1
 		for d in self.descriptors:
-			if d.descriptorType == "StringDescriptor":
+			if d.descriptorType == "String":
 				s = d.getValue("bString")
 				l[s] = idx
 				idx += 1
@@ -129,7 +129,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 			return None
 
 		for d in self.descriptors:
-			if d.descriptorType != "StringDescriptor":
+			if d.descriptorType != "String":
 				continue
 
 			strid -= 1
@@ -154,11 +154,11 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 
 		return descriptorList
 
-	def findDescriptorsWithField(self, field, typeConstraint = ""):
+	def findDescriptorsWithFields(self, fields, typeConstraint = ""):
 		descriptorList = []
 
 		for d in self.descriptors:
-			self.findDescriptorsWithFieldRecursive(d, [field], typeConstraint, descriptorList)
+			self.findDescriptorsWithFieldRecursive(d, fields, typeConstraint, descriptorList)
 
 		resultList = {}
 

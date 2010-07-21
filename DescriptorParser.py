@@ -174,7 +174,6 @@ def parseDescriptorFromFile(filename, descriptorTemplates):
 				for d in descList:
 					parentList.append(d)
 					desc = d
-					print d
 
 				if (indent > runningindent):
 					stack.append({ "list": parentList, "indent": runningindent})
