@@ -153,20 +153,17 @@ langids = {
 
 def createInterfaceClassCodes(name):
 	elem = DescriptorElementClass("enum", size = 1, name = name)
-	elem.enum = { "Defined at interface level": 0,
+	elem.enum = {
+			"Defined at interface level": 0,
 			"Audio": 1, "Conn": 2, "HID": 3, "Pysical": 4, "Still Image": 5, "Printer": 6,
 			"Mass Storage": 7, "HUB": 8, "CDC Data": 9, "CSCID": 0xa, "Content Sec": 0xb,
-			"Video": 0xd, "Misc": 0xe, "App Specific": 0xef, "Vendor specific": 0xff }
+			"Video": 0xd, "Misc": 0xe, "App Specific": 0xef, "Vendor specific": 0xff
+			}
 	return elem
 
 def createDeviceDescriptorTemplate():
 	desc = DescriptorClass("DeviceDescriptor")
 	desc.allowedParents.append("Root")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 1
@@ -239,11 +236,6 @@ def createConfigDescriptorTemplate():
 	desc = DescriptorClass("ConfigurationDescriptor")
 	desc.allowedParents.append("Root")
 
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
-
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 2
 	elem.comment = "CONFIGURATION Descriptor Type"
@@ -297,11 +289,6 @@ def createStringDescriptorTemplate():
 	desc = DescriptorClass("StringDescriptor")
 	desc.allowedParents.append("Root")
 
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
-
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 3
 	elem.comment = "STRING Descriptor Type"
@@ -315,11 +302,6 @@ def createStringDescriptorTemplate():
 def createStringDescriptorZeroTemplate():
 	desc = DescriptorClass("StringDescriptorZero")
 	desc.allowedParents.append("Root")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 3
@@ -339,11 +321,6 @@ def createStringDescriptorZeroTemplate():
 def createInterfaceDescriptorTemplate():
 	desc = DescriptorClass("InterfaceDescriptor")
 	desc.allowedParents.append("ConfigurationDescriptor")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 4
@@ -393,23 +370,22 @@ def createEndpointDescriptorTemplate():
 	desc = DescriptorClass("EndpointDescriptor")
 	desc.allowedParents.append("InterfaceDescriptor")
 
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
-
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 5
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "bitmap", size = 1, name = "bEndpointAddress")
-	bitmap = DescriptorElementClass("variable", size = 4, name = "Endpoint Number")
+	bitmap = DescriptorElementClass("enum", size = 4, name = "Endpoint Number")
+	for i in range(1, 16):
+		bitmap.enum[str(i)] = i
 	bitmap.offset = 0
 	elem.appendBitmap(bitmap)
 	bitmap = DescriptorElementClass("enum", size = 1, name = "Direction")
 	bitmap.enum = { "OUT": 0, "IN": 1 };
 	bitmap.offset = 7
 	elem.appendBitmap(bitmap)
+	elem.suggestionType = "EndpointAddress"
+	elem.value = 1
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "bitmap", size = 1, name = "bEndpointAttributes")
@@ -436,11 +412,6 @@ def createEndpointDescriptorTemplate():
 def createDeviceQualifierTemplate():
 	desc = DescriptorClass("DeviceQualifier")
 	desc.allowedParents.append("ConfigurationDescriptor")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 6
@@ -497,11 +468,6 @@ def createInterfaceAssociationDescriptorTemplate():
 	desc = DescriptorClass("InterfaceAssociationDescriptor")
 	desc.allowedParents.append("Root")
 
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
-
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 8
 	desc.addElement(elem)
@@ -532,11 +498,6 @@ def createInterfaceAssociationDescriptorTemplate():
 def createDFUFunctionDescriptorTemplate():
 	desc = DescriptorClass("DFUFunctionalDescriptor")
 	desc.allowedParents.append("InterfaceDescriptor")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 0x21
@@ -609,7 +570,8 @@ UAC2SpatialLocations = {
 				"Bottom Center - BC": 24,
 				"Back Left of Center - BLC": 25,
 				"Back Right of Center - BRC": 26,
-				"Raw Data - RD": 31 }
+				"Raw Data - RD": 31
+			}
 
 def createUAC2SpatialLocations(name):
 	elem = DescriptorElementClass(elementType = "bitmap", size = 4, name = name)
@@ -627,11 +589,6 @@ def createUAC2SpatialLocations(name):
 def createUAC2InterfaceHeaderDescriptorTemplate():
 	desc = DescriptorClass("UAC2InterfaceHeaderDescriptor")
 	desc.allowedParents.append("InterfaceDescriptor")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 0x24
@@ -664,7 +621,7 @@ def createUAC2InterfaceHeaderDescriptorTemplate():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "wTotalLength")
-	elem.autoMethod = "descriptorSize"
+	elem.autoMethod = "descriptorSizeAllChildren"
 	elem.comment = "Total number of bytes returned for the class-specific AudioControl interface descriptor."
 	desc.addElement(elem)
 
@@ -676,12 +633,7 @@ def createUAC2InterfaceHeaderDescriptorTemplate():
 
 def createUAC2InputTerminalDescriptorTemplate():
 	desc = DescriptorClass("UAC2InputTerminalDescriptor")
-	desc.allowedParents.append("InterfaceDescriptor")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
+	desc.allowedParents.append("UAC2InterfaceHeaderDescriptor")
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 0x24
@@ -692,6 +644,7 @@ def createUAC2InputTerminalDescriptorTemplate():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bTerminalID")
+	elem.suggestionType = "UAC2Unit"
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "enum", size = 2, name = "wTerminalType")
@@ -746,12 +699,7 @@ def createUAC2InputTerminalDescriptorTemplate():
 
 def createUAC2OutputTerminalDescriptorTemplate():
 	desc = DescriptorClass("UAC2OutputTerminalDescriptor")
-	desc.allowedParents.append("InterfaceDescriptor")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
+	desc.allowedParents.append("UAC2InterfaceHeaderDescriptor")
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 0x24
@@ -762,6 +710,7 @@ def createUAC2OutputTerminalDescriptorTemplate():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bTerminalID")
+	elem.suggestionType = "UAC2Unit"
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "enum", size = 2, name = "wTerminalType")
@@ -810,12 +759,7 @@ def createUAC2MixerUnitDescriptorTemplate():
 
 def createUAC2SelectorUnitDescriptorTemplate():
 	desc = DescriptorClass("UAC2SelectorUnitDescriptor")
-	desc.allowedParents.append("InterfaceDescriptor")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
+	desc.allowedParents.append("UAC2InterfaceHeaderDescriptor")
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 0x24
@@ -826,6 +770,7 @@ def createUAC2SelectorUnitDescriptorTemplate():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bUnitID")
+	elem.suggestionType = "UAC2Unit"
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bNrInPins")
@@ -852,12 +797,7 @@ def createUAC2SelectorUnitDescriptorTemplate():
 
 def createUAC2FeatureUnitDescriptorTemplate():
 	desc = DescriptorClass("UAC2FeatureUnitDescriptor")
-	desc.allowedParents.append("InterfaceDescriptor")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
+	desc.allowedParents.append("UAC2InterfaceHeaderDescriptor")
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 0x24
@@ -868,6 +808,7 @@ def createUAC2FeatureUnitDescriptorTemplate():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bUnitID")
+	elem.suggestionType = "UAC2Unit"
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "link", size = 1, name = "bSourceID")
@@ -906,12 +847,7 @@ def createUAC2FeatureUnitDescriptorTemplate():
 
 def createUAC2ClockSourceDescriptorTemplate():
 	desc = DescriptorClass("UAC2ClockSourceDescriptor")
-	desc.allowedParents.append("InterfaceDescriptor")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
+	desc.allowedParents.append("UAC2InterfaceHeaderDescriptor")
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 0x24
@@ -922,6 +858,7 @@ def createUAC2ClockSourceDescriptorTemplate():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bClockID")
+	elem.suggestionType = "UAC2Clock"
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "bitmap", size = 1, name = "bmAttributes")
@@ -956,12 +893,7 @@ def createUAC2ClockSourceDescriptorTemplate():
 
 def createUAC2ClockSelectorUnitDescriptorTemplate():
 	desc = DescriptorClass("UAC2ClockSelectorUnitDescriptor")
-	desc.allowedParents.append("InterfaceDescriptor")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
+	desc.allowedParents.append("UAC2InterfaceHeaderDescriptor")
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 0x24
@@ -972,6 +904,7 @@ def createUAC2ClockSelectorUnitDescriptorTemplate():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bClockID")
+	elem.suggestionType = "UAC2Clock"
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bNrInPins")
@@ -999,12 +932,7 @@ def createUAC2ClockSelectorUnitDescriptorTemplate():
 
 def createUAC2ClockMultiplierDescriptorTemplate():
 	desc = DescriptorClass("UAC2ClockMultiplierDescriptor")
-	desc.allowedParents.append("InterfaceDescriptor")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
+	desc.allowedParents.append("UAC2InterfaceHeaderDescriptor")
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 0x24
@@ -1015,6 +943,7 @@ def createUAC2ClockMultiplierDescriptorTemplate():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bClockID")
+	elem.suggestionType = "UAC2Clock"
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "link", size = 1, name = "bCSourceID")
@@ -1036,12 +965,7 @@ def createUAC2ClockMultiplierDescriptorTemplate():
 
 def createUAC2SamplingRateConverterUnitDescriptorTemplate():
 	desc = DescriptorClass("UAC2SamplingRateConverterUnitDescriptor")
-	desc.allowedParents.append("InterfaceDescriptor")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
+	desc.allowedParents.append("UAC2InterfaceHeaderDescriptor")
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 0x24
@@ -1051,7 +975,8 @@ def createUAC2SamplingRateConverterUnitDescriptorTemplate():
 	elem.value = 0xd
 	desc.addElement(elem)
 
-	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bUnitID")
+	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bClockID")
+	elem.suggestionType = "UAC2Clock"
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "link", size = 1, name = "bSourceID")
@@ -1078,11 +1003,6 @@ def createAudioControlHeaderDescriptor():
 	desc = DescriptorClass("AudioControlHeaderDescriptor")
 	desc.allowedParents.append("InterfaceDescriptor")
 
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
-
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 0x24
 	desc.addElement(elem)
@@ -1096,7 +1016,7 @@ def createAudioControlHeaderDescriptor():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "wTotalLength")
-	elem.autoMethod = "descriptorSize"
+	elem.autoMethod = "descriptorSizeAllChildren"
 	elem.comment = "Total number of bytes returned for the class-specific AudioControl interface descriptor."
 	desc.addElement(elem)
 
@@ -1115,12 +1035,7 @@ def createAudioControlHeaderDescriptor():
 
 def createMIDIStreamingHeaderDescriptor():
 	desc = DescriptorClass("MIDIStreamingHeaderDescriptor")
-	desc.allowedParents.append("InterfaceDescriptor")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
+	desc.allowedParents.append("AudioControlHeaderDescriptor")
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 0x24
@@ -1144,12 +1059,7 @@ def createMIDIStreamingHeaderDescriptor():
 
 def createMIDIInJackDescriptor():
 	desc = DescriptorClass("MIDIInJackDescriptor")
-	desc.allowedParents.append("InterfaceDescriptor")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
+	desc.allowedParents.append("AudioControlHeaderDescriptor")
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 0x24
@@ -1166,6 +1076,7 @@ def createMIDIInJackDescriptor():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bJackID")
+	elem.suggestionType = "MIDIJack"
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "link", size = 1, name = "iJack")
@@ -1178,12 +1089,7 @@ def createMIDIInJackDescriptor():
 
 def createMIDIOutJackDescriptor():
 	desc = DescriptorClass("MIDIOutJackDescriptor")
-	desc.allowedParents.append("InterfaceDescriptor")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
+	desc.allowedParents.append("AudioControlHeaderDescriptor")
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 0x24
@@ -1200,6 +1106,7 @@ def createMIDIOutJackDescriptor():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bJackID")
+	elem.suggestionType = "MIDIJack"
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bNrInputPins")
@@ -1223,12 +1130,7 @@ def createMIDIOutJackDescriptor():
 
 def createMIDIEndpointDescriptor():
 	desc = DescriptorClass("MIDIEndpointDescriptor")
-	desc.allowedParents.append("InterfaceDescriptor")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
+	desc.allowedParents.append("AudioControlHeaderDescriptor")
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 0x25
@@ -1256,11 +1158,6 @@ def createMIDIEndpointDescriptor():
 def createHIDDescriptor():
 	desc = DescriptorClass("HIDDescriptor")
 	desc.allowedParents.append("InterfaceDescriptor")
-
-	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
-	elem.autoMethod = "descriptorSize"
-	elem.comment = "Size of this descriptor in bytes"
-	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 0x21

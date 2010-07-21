@@ -52,20 +52,7 @@ class MainFrame(wx.Frame):
 		menu1.Append(104, "&Quit", "")
 		menuBar.Append(menu1, "&File")
 
-		submenu = wx.Menu()
-		menuid = 1000
-
-		self.templates = templates
-		for t in self.templates:
-			submenu.Append(menuid, t.descriptorType)
-			self.Bind(wx.EVT_MENU, self.OnAddDescriptor, id=menuid)
-			menuid += 1
-
 		menu2 = wx.Menu()
-		menu2.AppendMenu(201, "&Add", submenu)
-		menu2.Append(202, "&Remove selected", "")
-
-		menu2.AppendSeparator()
 		menu2.Append(203, "&Dump", "")
 		menu2.AppendSeparator()
 		menu2.Append(204, "&Clear", "")
@@ -76,9 +63,10 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.OnOpen, id=101)
 		self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=104)
 
-		self.Bind(wx.EVT_MENU, self.OnRemoveDescriptor, id=202)
 		self.Bind(wx.EVT_MENU, self.OnDump, id=203)
 		self.Bind(wx.EVT_MENU, self.OnClearDescriptors, id=204)
+
+		self.templates = templates
 
 	def OnCloseWindow(self, event):
 		self.Close()
@@ -122,14 +110,6 @@ class MainFrame(wx.Frame):
 				print "\t%s_%d," % (key, n + 1)
 
 			print "};\n"
-
-	def OnAddDescriptor(self, event):
-		idx = event.GetId() - 1000
-		desc = copy.deepcopy(self.templates[idx])
-		self.tree.AddDescriptor(desc)
-
-	def OnRemoveDescriptor(self, event):
-		self.tree.RemoveSelectedDescriptor()
 
 	def OnClearDescriptors(self, event):
 		self.tree.RemoveAllDescriptors()

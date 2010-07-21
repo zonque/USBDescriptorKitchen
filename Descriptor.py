@@ -32,13 +32,12 @@ class DescriptorElementClass:
 		self.comment = ""
 		self.value = 0
 		self.strValue = ""
-		self.displayValue = ""
 		self.base = 0
 		self.offset = 0
 		self.enum = {}
 		self.bitmap = []
 		self.autoMethod = ""
-		self.autoMethodDetail = 0
+		self.suggestionType = False
 		self.createdByArray = False
 		self.parentElement = None
 
@@ -212,6 +211,13 @@ class DescriptorClass:
 		self.comment = comment
 		self.allowedParents = []
 		self.descriptiveString = None
+		self.parentDescriptor = None
+		self.parentList = None
+
+		elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
+		elem.autoMethod = "descriptorSize"
+		elem.comment = "Size of this descriptor in bytes"
+		self.addElement(elem)
 
 	def setParentList(self, pl):
 		self.parentList = pl
@@ -397,6 +403,14 @@ class DescriptorClass:
 			if e.name == field:
 				return e.getValue()
 		return -1
+
+	def iterateUp(self, descriptorType):
+		desc = self
+
+		while desc and desc.descriptorType != descriptorType:
+			desc = desc.parentDescriptor
+
+		return desc
 
 	def getSummaryName(self):
 		name = self.descriptorType

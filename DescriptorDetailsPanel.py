@@ -27,28 +27,57 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.OnEndLabelEdit)
 		self.Bind(wx.EVT_TREE_ITEM_RIGHT_CLICK, self.OnItemMenu)
 
+	def getElement(self, indices):
+		e = self.descriptor.elements[indices[0]]
+
+		if len(indices) == 2 and e.elementType == "bitmap":
+			e = e.bitmap[indices[1]]
+
+		return e	
+
+	def createMenu(self, element, items):
+		menu = wx.Menu()
+		for (k, v) in sorted(items, key=lambda(k,v): (v,k)):
+
+			if v != k:
+				title = "%s (%s)" % (k, element.dumpValueNoComma(element.convertToInt(v)))
+			else:
+				title = k
+
+			# "+1" for OS X where zero values are not allowed
+			item = wx.MenuItem(menu, v + 1, title)
+			menu.AppendItem(item)
+
+		menu.Bind(wx.EVT_MENU, self.OnEnumSelected)
+		return menu
+
 	def OnItemMenu(self, event):
 		# ignore right click other than on selection
 		if self.GetSelection() != event.GetItem():
 			return
 
 		indices = self.GetIndexOfItem(event.GetItem())
-		e = self.descriptor.elements[indices[0]]
+		e = self.getElement(indices)
 
-		if len(indices) == 2:
-			e = e.bitmap[indices[1]]
+		if e.createdByArray:
+			menu = wx.Menu()
+			menu.AppendItem(wx.MenuItem(menu, 100, "&Add field"))
+			menu.AppendItem(wx.MenuItem(menu, 101, "&Remove field"))
 
-		if not e.createdByArray:
-			return
+			menu.Bind(wx.EVT_MENU, self.OnAddField, id=100)
+			menu.Bind(wx.EVT_MENU, self.OnRemoveField, id=101)
 
-		menu = wx.Menu()
-		menu.AppendItem(wx.MenuItem(menu, 100, "&Add field"))
-		menu.AppendItem(wx.MenuItem(menu, 101, "&Remove field"))
+			self.PopupMenu(menu)
 
-		menu.Bind(wx.EVT_MENU, self.OnAddField, id=100)
-		menu.Bind(wx.EVT_MENU, self.OnRemoveField, id=101)
+		if e.suggestionType:
+			suggestions = self.getSuggestions(e)
+			submenu = self.createMenu(e, suggestions.items())
+			self.editedElement = e
 
-		self.PopupMenu(menu)
+			if submenu.GetMenuItemCount():
+				menu = wx.Menu()
+				menu.AppendMenu(100, "&Suggestions", submenu)
+				self.PopupMenu(menu)
 
 	def getPossibleLinks(self, element):
 		if element.linkType == "stringIndex":
@@ -65,12 +94,12 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 
 		print "Missing implementation for link type %s" % element.linkType
 
+	def getSuggestions(self, element):
+		return self.descriptorList.suggestValues(self.descriptor, element)
+
 	def OnBeginLabelEdit(self, event):
 		indices = self.GetIndexOfItem(event.GetItem())
-		e = self.descriptor.elements[indices[0]]
-
-		if len(indices) == 2:
-			e = e.bitmap[indices[1]]
+		e = self.getElement(indices)
 
 		if (e.elementType == "variable" or
 		    e.elementType == "string"):
@@ -80,7 +109,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		items = None
 
 		if e.elementType == "enum":
-			items = sorted(e.enum.iteritems(), key=lambda(k,v): (v,k))
+			items = e.enum.iteritems()
 
 		if e.elementType == "link":
 			p = self.getPossibleLinks(e)
@@ -93,20 +122,8 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 			items = p.items()
 
 		if items:
-			menu = wx.Menu()
-
-			for (k, v) in items:
-				if v != k:
-					title = "%s (%s)" % (k, e.dumpValueNoComma(e.convertToInt(v)))
-				else:
-					title = k
-
-				# "+1" for OS X where zero values are not allowed
-				item = wx.MenuItem(menu, v + 1, title)
-				menu.AppendItem(item)
-
+			menu = self.createMenu(e, items)
 			self.editedElement = e
-			menu.Bind(wx.EVT_MENU, self.OnEnumSelected)
 			self.PopupMenu(menu)
 
 		event.Veto()
@@ -119,10 +136,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		self.descriptorList.UpdateSummaryNames()
 
 	def OnGetItemText(self, indices, column=0):
-		e = self.descriptor.elements[indices[0]]
-
-		if len(indices) == 2 and e.elementType == "bitmap":
-			e = e.bitmap[indices[1]]
+		e = self.getElement(indices)
 
 		if column == 0:
 			return e.name
@@ -168,12 +182,10 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		return 0
 
 	def OnGetItemTextColour(self, indices):
-		e = self.descriptor.elements[indices[0]]
+		e = self.getElement(indices)
 
-		if len(indices) == 2 and e.elementType == "bitmap":
-			e = e.bitmap[indices[1]]
-
-		if e.elementType == "variable":
+		if (e.elementType == "variable" or
+		    e.elementType == "string"):
 			return wx.RED
 
 		if (e.elementType == "enum" or
@@ -189,6 +201,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 			return;
 
 		e.setValue(selected)
+		e.updateBitmap()
 		self.editedElement = None
 
 		event.Skip()
@@ -198,22 +211,14 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 	def OnAddField(self, event):
 		item = self.GetSelection()
 		indices = self.GetIndexOfItem(item)
-		e = self.descriptor.elements[indices[0]]
-
-		if len(indices) == 2:
-			e = e.bitmap[indices[1]]
-
+		e = self.getElement(indices)
 		self.descriptor.addArrayField(e)
 		self.RefreshItems()
 
 	def OnRemoveField(self, event):
 		item = self.GetSelection()
 		indices = self.GetIndexOfItem(item)
-		e = self.descriptor.elements[indices[0]]
-
-		if len(indices) == 2:
-			e = e.bitmap[indices[1]]
-
+		e = self.getElement(indices)
 		self.descriptor.removeArrayField(e)
 		self.RefreshItems()
 

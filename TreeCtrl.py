@@ -92,6 +92,8 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 			return False
 
 		newdescriptor.setParentList(parent)
+		newdescriptor.parentDescriptor = selectedDescriptor
+
 		item = self.AppendItem(root, newdescriptor.getSummaryName())
 		self.SetPyData(item, newdescriptor)
 		self.SetItemTextColour(item, wx.BLACK)
@@ -134,32 +136,102 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 			if strid == 0:
 				return d.getValue("bString")
 
-	def findDescriptorsWithFieldRecursive(self, desc, field, typeConstraint, resultList):
-		if desc.descriptorType[:len(typeConstraint)] == typeConstraint and desc.hasField(field):
-			n = desc.getValue(field)
+	def findDescriptorsWithFieldRecursive(self, desc, fields, typeConstraint, descriptorList):
+		matched = False
+		
+		if desc.descriptorType[:len(typeConstraint)] == typeConstraint:
+			for field in fields:
+				if desc.hasField(field):
+					value = desc.getValue(field)
+					matched = True
+					
+		if matched:
+			#print "matched: %s v %d" % (desc.descriptorType, value)
+			descriptorList.append((desc, value))
+
+		for c in desc.children:
+			self.findDescriptorsWithFieldRecursive(c, fields, typeConstraint, descriptorList)
+
+		return descriptorList
+
+	def findDescriptorsWithField(self, field, typeConstraint = ""):
+		descriptorList = []
+
+		for d in self.descriptors:
+			self.findDescriptorsWithFieldRecursive(d, [field], typeConstraint, descriptorList)
+
+		resultList = {}
+
+		for (desc, value) in descriptorList:
 			s = None
 
 			if desc.descriptiveString:
 				s = self.resolveStringDescriptor(desc.getValue(desc.descriptiveString))
 				if s:
-					s += " (%d)" % n
+					s += " (%d)" % value
 
 			if not s:
-				s = str(n)
+				s = str(value)
 
-			resultList[s] = n
-
-		for c in desc.children:
-			self.findDescriptorsWithFieldRecursive(c, field, typeConstraint, resultList)
+			resultList[s] = value
 
 		return resultList
 
-	def findDescriptorsWithField(self, field, typeConstraint = ""):
+	def suggestValues(self, descriptor, element):
 		resultList = {}
+		valueList = []
+		descriptorList = []
 
-		for d in self.descriptors:
-			self.findDescriptorsWithFieldRecursive(d, field, typeConstraint, resultList)
+		# traverse up to the configuration descriptor
+		configDescriptor = descriptor.iterateUp("ConfigurationDescriptor")
+		if not configDescriptor:
+			print "Oops - no config descriptor?"
+			return {}
 
+		if element.suggestionType == "EndpointAddress":
+			# first add all possible values
+			for i in range(1, 16):
+				valueList.append(i)
+				valueList.append(i | 0x80)
+
+			# and then subtract those which are already taken
+			for desc in configDescriptor.children:
+				self.findDescriptorsWithFieldRecursive(desc, ["bEndpointAddress"], "Endpoint", descriptorList)
+
+		if element.suggestionType == "UAC2Unit":
+			# first add all possible values
+			for i in range(255):
+				valueList.append(i)
+
+			# and then subtract those which are already taken
+			for desc in configDescriptor.children:
+				self.findDescriptorsWithFieldRecursive(desc, ["bUnitID", "bTerminalID"], "UAC2", descriptorList)
+	
+		if element.suggestionType == "UAC2Clock":
+			# first add all possible values
+			for i in range(255):
+				valueList.append(i)
+
+			# and then subtract those which are already taken
+			for desc in configDescriptor.children:
+				self.findDescriptorsWithFieldRecursive(desc, ["bClockID"], "UAC2", descriptorList)
+
+		if element.suggestionType == "MIDIJack":
+			# first add all possible values
+			for i in range(255):
+				valueList.append(i)
+
+			# and then subtract those which are already taken
+			for desc in configDescriptor.children:
+				self.findDescriptorsWithFieldRecursive(desc, ["bJackID"], "MIDI", descriptorList)
+
+		for (desc, value) in descriptorList:
+			if value in valueList:
+				valueList.remove(value)
+				
+		for i in valueList:
+			resultList[str(i)] = i
+				
 		return resultList
 
 	def BuildTree(self):
