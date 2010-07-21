@@ -18,7 +18,7 @@ def reconstructFields(desc, array):
 	idx = 0
 
 	# now copy over all non-constant elements
-	for e in desc.elements:	
+	for e in desc.elements:
 		if e.elementType == "constant" or \
 		   e.elementType == "auto":
 			idx += e.size
@@ -46,6 +46,8 @@ def reconstructDescriptor(array, descriptorTemplates, state, parentList):
 		off = 0
 		matched = True
 
+		print "trying %s" % t.descriptorType
+
 		# test if all constant elements in the template descriptor match
 		for e in t.elements:
 			if (off + e.size > len(array)):
@@ -58,22 +60,26 @@ def reconstructDescriptor(array, descriptorTemplates, state, parentList):
 				v |= array[off + n] << (n * 8)
 
 			if e.elementType == "constant" and e.value != v:
+				print "  nomatch due to element %s (%d != %d)" % (e.name, e.value, v)
 				matched = False
 
 			if e.elementType == "enum":
 				enumvals = []
 				for (name, enumval) in e.enum.items():
-					enumvals.append(int(enumval))
-
-				#print enumvals
+					enumvals.append(enumval)
 
 				if not v in enumvals:
 					matched = False
+					print "  nomatch due to element %s (%d not in" % (e.name, v),
+					print enumvals
+
 
 			off += e.size
 
 		if not matched:
 			continue
+
+		print " --- success: %s" % t.descriptorType
 
 		# quirks for string descriptors - a StringDescriptorZero must always come first
 		if t.descriptorType == "StringDescriptorZero":
@@ -102,16 +108,13 @@ def reconstructDescriptors(array, descriptorTemplates, state, parentList):
 	l = []
 
 	while idx < len(array):
-		length = int(array[idx], 16)
+		length = array[idx]
 
 		if length == 0:
 			print "bogus descriptors"
 			return []
 
-		subarray = []
-		for b in array[idx:idx+length]:
-			subarray.append(int(b, 16))
-
+		subarray = array[idx:idx+length]
 		idx += length
 
 		d = reconstructDescriptor(subarray, descriptorTemplates, state, parentList)
@@ -181,7 +184,13 @@ def parseDescriptorFromFile(filename, descriptorTemplates):
 
 		runningindent = indent
 
-		array += re.findall("(0x[0-9a-fA-F][0-9a-fA-F])", s)
+		# use eval() here for more complex, possibly pre-generated input
+		for n in re.split(",", s):
+			try:
+				v = eval(n)
+				array.append(v)
+			except:
+				continue
 
 	f.close()
 
