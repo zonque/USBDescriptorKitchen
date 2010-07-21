@@ -1,6 +1,6 @@
 ---------------- README for USBDescriptorKitchen ----------------
 
-UBDescriptorKitchen is a tool that helps developers of USB firmwares to ease
+USBDescriptorKitchen is a tool that helps developers of USB firmwares to ease
 the pain of calculating lengths of descriptors, fiddling with bits, dealing
 with variable length fields etc.
 
