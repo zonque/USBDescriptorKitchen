@@ -167,13 +167,13 @@ class DescriptorElementClass:
 		out += "%s%s/* %s" % (dump, padding, self.name)
 
 		if self.comment != "":
-			out += "(%s) " % self.comment
+			out += " (%s)" % self.comment
 
 		if self.elementType == "enum":
-			out += "(\"%s\") " % self.getEnumKey()
+			out += " (\"%s\")" % self.getEnumKey()
 
 		if self.elementType == "bitmap":
-			out += "("
+			out += " ("
 			first = 1
 			for b in self.bitmap:
 				if not first:
@@ -183,7 +183,7 @@ class DescriptorElementClass:
 			out += ")"
 
 		if self.size > 1:
-			out += "(%d) " % self.value
+			out += " (%d)" % self.value
 
 		out += "*/\n"
 		return out
@@ -214,6 +214,7 @@ class DescriptorClass:
 		self.descriptiveString = None
 		self.parentDescriptor = None
 		self.parentList = None
+		self.dependsOnDescriptor = None
 
 		elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bLength")
 		elem.autoMethod = "descriptorSize"

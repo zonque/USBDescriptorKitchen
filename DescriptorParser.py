@@ -75,15 +75,15 @@ def reconstructDescriptor(array, descriptorTemplates, state, parentList):
 		if not matched:
 			continue
 
-		# quirks for string descriptors - a StringDescriptorZero must always come first
-		if t.descriptorType == "StringDescriptorZero":
-			if "stringDescriptorZeroSeen" in state:
-				continue
-
-			state.append("stringDescriptorZeroSeen")
-
 		desc = copy.deepcopy(t)
 		desc.setParentList(parentList)
+
+		# quirks for string descriptors - a StringDescriptorZero must always come first
+		if desc.descriptorType.descriptorType == "StringZero":
+			if "stringDescriptorZeroSeen" in state:
+				desc.descriptorType == "String"
+			else:
+				state.append("stringDescriptorZeroSeen")
 
 		# reconstruct fields once
 		reconstructFields(desc, array)

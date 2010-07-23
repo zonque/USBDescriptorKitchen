@@ -225,7 +225,7 @@ def createDeviceDescriptor():
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bNumConfigurations")
 	elem.autoMethod = "countDescriptorsOfType"
-	elem.autoMethodDetail = "ConfigurationDescriptor"
+	elem.autoMethodDetail = "Configuration"
 	elem.comment = "Number of possible configurations"
 	desc.addElement(elem)
 
@@ -289,6 +289,7 @@ def createConfigDescriptor():
 def createStringDescriptor():
 	desc = DescriptorClass("String")
 	desc.allowedParents.append("Root")
+	desc.dependsOnDescriptor = "StringZero"
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 3
@@ -301,7 +302,7 @@ def createStringDescriptor():
 	return desc
 
 def createStringDescriptorZero():
-	desc = DescriptorClass("StringDescriptorZero")
+	desc = DescriptorClass("StringZero")
 	desc.allowedParents.append("Root")
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
@@ -470,7 +471,7 @@ def createOtherSpeedConfigurationDescriptor():
 
 def createInterfaceAssociationDescriptor():
 	desc = DescriptorClass("InterfaceAssociation")
-	desc.allowedParents.append("Root")
+	desc.allowedParents.append("Configuration")
 
 	elem = DescriptorElementClass(elementType = "constant", size = 1, name = "bDescriptorType")
 	elem.value = 8
@@ -820,9 +821,8 @@ def createUAC2FeatureUnitDescriptor():
 	elem.linkType = "UAC2Unit"
 	desc.addElement(elem)
 
-	arr = DescriptorElementArrayClass("bNrInPins")
-	arr.arrayLength = "given"
-	arr.arrayLengthField = "bNrInPins"
+	arr = DescriptorElementArrayClass("bSourceID")
+	arr.arrayLength = "dynamic"
 	member = DescriptorElementArrayMemberClass(memberType = "bitmap", size = 4, name = "bmaControls")
 	member.appendBitmap(createUACbmControls("Mute Control", 0))
 	member.appendBitmap(createUACbmControls("Volume Control", 2))
@@ -1082,7 +1082,7 @@ def createMIDIInJackDescriptor():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bJackID")
-	elem.suggestionType = "MIDIJack"
+	elem.suggestionType = "UAC2Unit"
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "link", size = 1, name = "iJack")
@@ -1112,7 +1112,7 @@ def createMIDIOutJackDescriptor():
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bJackID")
-	elem.suggestionType = "MIDIJack"
+	elem.suggestionType = "UAC2Unit"
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bNrInputPins")

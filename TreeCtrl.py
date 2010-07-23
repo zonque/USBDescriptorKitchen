@@ -80,6 +80,22 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 			parent = self.descriptors
 			parentType = "Root"
 
+		if newdescriptor.dependsOnDescriptor:
+			found = False
+
+			for d in parent:
+				if d.descriptorType == newdescriptor.dependsOnDescriptor:
+					found = True
+
+			if not found:
+				s = "Descriptor of type \"%s\" depends on \"%s\" which is non-existant." % \
+					(newdescriptor.descriptorType, newdescriptor.dependsOnDescriptor)
+
+				dlg = wx.MessageDialog(self, s, "Error adding descriptor", wx.OK | wx.ICON_ERROR)
+				dlg.ShowModal()
+				dlg.Destroy()
+				return False
+
 		if not parentType in newdescriptor.allowedParents:
 			s = "Illegal parent \"%s\" for descriptor of type \"%s\". " % (parentType, newdescriptor.descriptorType)
 			s += "Allowed parent types are:\n\n"
