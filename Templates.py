@@ -181,8 +181,7 @@ def createDeviceDescriptor():
 	elem.comment = "Class code (assigned by the USB-IF)."
 	desc.addElement(elem)
 
-	elem = DescriptorElementClass("enum", size = 1, name = "bDeviceSubClass")
-	elem.enum = { "Defined at interface level": 0x00, "Vendor specific": 0xff }
+	elem = DescriptorElementClass("variable", size = 1, name = "bDeviceSubClass")
 	elem.comment = "Subclass code (assigned by the USB-IF)."
 	desc.addElement(elem)
 
@@ -349,10 +348,9 @@ def createInterfaceDescriptor():
 
 	elem = DescriptorElementClass(elementType = "enum", size = 1, name = "bInterfaceSubClass")
 	elem.comment = "Subclass code (assigned by the USB-IF)."
-	elem.enum = {
-					"0": 0, "1": 1, "2": 2,
-					"AUDIOCONTROL": 0x01, "MIDISTREAMING": 0x03
-				}
+	elem.enum = {	"0": 0, "1": 1, "2": 2,
+			"AUDIOCONTROL": 0x01, "MIDISTREAMING": 0x03
+		}
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bInterfaceProtocol")
@@ -433,8 +431,7 @@ def createDeviceQualifier():
 	elem.comment = "Class Code"
 	desc.addElement(elem)
 
-	elem = DescriptorElementClass("enum", size = 1, name = "bDeviceSubClass")
-	elem.enum = { "Defined at interface level": 0x00, "Vendor specific": 0xff }
+	elem = DescriptorElementClass("variable", size = 1, name = "bDeviceSubClass")
 	elem.comment = "Subclass Code"
 	desc.addElement(elem)
 
