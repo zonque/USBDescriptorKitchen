@@ -1,6 +1,7 @@
 import re
 import copy
 import string
+import Templates
 import Descriptor
 
 def commentRemover(text):
@@ -62,6 +63,7 @@ def reconstructDescriptor(array, descriptorTemplates, state, parentList):
 			if e.elementType == "constant" and e.value != v:
 				print "  nomatch due to element %s (%d != %d)" % (e.name, e.value, v)
 				matched = False
+				break
 
 			if e.elementType == "enum":
 				enumvals = []
@@ -72,29 +74,25 @@ def reconstructDescriptor(array, descriptorTemplates, state, parentList):
 					matched = False
 					print "  nomatch due to element %s (%d not in" % (e.name, v),
 					print enumvals
-
+					break
 
 			off += e.size
 
 		if not matched:
 			continue
 
+		desc = None
+
 		# quirks for string descriptors - a StringDescriptorZero must always come first
-		if t.descriptorType == "StringDescriptorZero":
-			if "stringDescriptorZeroSeen" in state:
-				continue
+		if t.descriptorType == "String":
+			if not "stringZeroSeen" in state:
+				desc = Templates.createStringDescriptorZero()
+				state.append("stringZeroSeen")
 
-			state.append("stringDescriptorZeroSeen")
+		if not desc:
+			desc = copy.deepcopy(t)
 
-		desc = copy.deepcopy(t)
 		desc.setParentList(parentList)
-
-		# quirks for string descriptors - a StringDescriptorZero must always come first
-		if desc.descriptorType.descriptorType == "StringZero":
-			if "stringDescriptorZeroSeen" in state:
-				desc.descriptorType == "String"
-			else:
-				state.append("stringDescriptorZeroSeen")
 
 		# reconstruct fields once
 		reconstructFields(desc, array)

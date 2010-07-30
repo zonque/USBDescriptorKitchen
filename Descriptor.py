@@ -185,7 +185,7 @@ class DescriptorElementClass:
 		if self.size > 1:
 			out += " (%d)" % self.value
 
-		out += "*/\n"
+		out += " */\n"
 		return out
 
 	def updateSize(self):
