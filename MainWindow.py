@@ -10,7 +10,7 @@ import Descriptor
 import DescriptorParser
 import TreeCtrl
 import DescriptorDetailsPanel
-import Templates
+import Templates.Templates
 
 def getVersion():
 	return "0.2"
@@ -165,7 +165,7 @@ class MainFrame(wx.Frame):
 if __name__ == '__main__':
 	import sys,os
 
-	templates = Templates.createTemplates()
+	templates = Templates.Templates.createTemplates()
 
 	app = wx.App(False)
 	frame = MainFrame(None, templates)

@@ -1,8 +1,8 @@
 import re
 import copy
 import string
-import Templates
 import Descriptor
+import Templates.Templates
 
 def commentRemover(text):
 	def replacer(match):
@@ -86,7 +86,7 @@ def reconstructDescriptor(array, descriptorTemplates, state, parentList):
 		# quirks for string descriptors - a StringDescriptorZero must always come first
 		if t.descriptorType == "String":
 			if not "stringZeroSeen" in state:
-				desc = Templates.createStringDescriptorZero()
+				desc = Templates.Basic.createStringDescriptorZero()
 				state.append("stringZeroSeen")
 
 		if not desc:
