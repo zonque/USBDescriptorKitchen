@@ -248,7 +248,7 @@ def createConfigDescriptor():
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bNumInterfaces")
 	elem.autoMethod = "countChildrenOfType"
-	elem.autoMethodDetail = "InterfaceDescriptor"
+	elem.autoMethodDetail = "Interface"
 	elem.comment = "Number of interfaces supported by this configuration"
 	desc.addElement(elem)
 

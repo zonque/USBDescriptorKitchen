@@ -11,6 +11,7 @@ import DescriptorParser
 import TreeCtrl
 import DescriptorDetailsPanel
 import Templates.Templates
+import Check.Check
 
 def getVersion():
 	return "0.2"
@@ -35,9 +36,7 @@ class MainWindow(wx.Panel):
 		sizer.Add(splitter, 1, wx.EXPAND)
 		self.SetSizer(sizer)
 
-		tree = self.descriptorTree
-
-		parent.setTree(tree)
+		parent.setTree(self.descriptorTree)
 
 class MainFrame(wx.Frame):
 
@@ -64,6 +63,7 @@ class MainFrame(wx.Frame):
 		self.Bind(wx.EVT_MENU, self.OnFileOpen, id=101)
 		self.Bind(wx.EVT_MENU, self.OnFileSave, id=102)
 		self.Bind(wx.EVT_MENU, self.OnFileSaveAs, id=103)
+		self.Bind(wx.EVT_MENU, self.OnCheck, id=104)
 		self.Bind(wx.EVT_MENU, self.OnDump, id=105)
 		self.Bind(wx.EVT_MENU, self.OnClearDescriptors, id=106)
 		self.Bind(wx.EVT_MENU, self.OnCloseWindow, id=107)
@@ -112,6 +112,9 @@ class MainFrame(wx.Frame):
 			out += "};\n\n"
 
 		return out
+
+	def OnCheck(self, event):
+		Check.Check.doCheck(self, self.tree.descriptors)
 
 	def OnDump(self, event):
 		print self.doDump()
