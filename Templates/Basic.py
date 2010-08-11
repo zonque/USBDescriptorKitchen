@@ -338,7 +338,7 @@ def createInterfaceDescriptor():
 
 	elem = DescriptorElementClass(elementType = "auto", size = 1, name = "bNumEndpoints")
 	elem.autoMethod = "countChildrenOfType"
-	elem.autoMethodDetail = "EndpointDescriptor"
+	elem.autoMethodDetail = "Endpoint"
 	elem.comment = "Number of endpoints used by this interface"
 	desc.addElement(elem)
 
