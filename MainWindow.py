@@ -14,7 +14,7 @@ import Templates.Templates
 import Check.Check
 
 def getVersion():
-	return "0.2"
+	return "0.3"
 
 wildcard = 	"Header Files (*.h)|*h|" \
 		"All files (*)|*"
@@ -84,7 +84,7 @@ class MainFrame(wx.Frame):
 		out += "   and use an editor that doesn't mess around with the linefeeds.\n"
 		out += "\n"
 		out += "   See http://github.com/zonque/USBDescriptorKitchen/\n"
-		out += "   for more information about the tool that was used to generate this file\n"
+		out += "   for more information about the tool that was used to generate this file.\n"
 		out += " ***************************************************************************/"
 		out += "\n"
 

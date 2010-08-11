@@ -382,7 +382,6 @@ def createUAC2ClockSelectorUnitDescriptor():
 	arr.arrayLengthField = "bNrInPins"
 	member = DescriptorElementArrayMemberClass(memberType = "link", size = 1, name = "baCSourceID")
 	member.linkType = "UAC2Clock"
-	print "memberType %s" % member.memberType
 	arr.appendMember(member)
 	desc.addElementArray(arr)
 
