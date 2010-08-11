@@ -1,8 +1,8 @@
 == ABOUT
 
-USBDescriptorKitchen is a tool that helps developers of USB firmwares to ease
-the pain of calculating lengths of descriptors, fiddling with bits, dealing
-with variable length fields etc.
+USBDescriptorKitchen is a GUI-driven tool that helps developers of USB
+firmwares to ease the pain of calculating lengths of descriptors,
+fiddling with bits, dealing with variable length fields etc.
 
 It is written in wxPython and works well on Linux and Mac OS X.
 
@@ -29,6 +29,10 @@ of descriptor elements:
   RED   - variable content. Left-click on the "Value" column to open a
           text editor field.
 
+On some elements, a right click will offer a context menu for suggested values.
+As an example, the address field of an endpoint descriptor can be chosen from
+a list of addresses which are not yet taken by other endpoints in the same
+configuration.
 
 You can save the descriptor set to a file or dump it to stdout at any time.
 
@@ -63,7 +67,4 @@ There are possibly some bugs left, and definitely the list of supported
 descriptors is incomplete. Feedback helping to improve things is always
 welcome, preferrably in the form of proper git patches.
 
-
-
-Daniel Mack, August 2010
 
