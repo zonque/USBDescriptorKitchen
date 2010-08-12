@@ -29,10 +29,18 @@ of descriptor elements:
   RED   - variable content. Left-click on the "Value" column to open a
           text editor field.
 
-On some elements, a right click will offer a context menu for suggested values.
-As an example, the address field of an endpoint descriptor can be chosen from
-a list of addresses which are not yet taken by other endpoints in the same
-configuration.
+There are also two types of array elements. The first one are arrays which
+have their length denoted in one descriptor field. To vary the number of
+array members, modify this field.
+
+The other array type implicitly counts the number of its array members
+with the all-over descriptor lengths. For this type, right-click on one
+member to add or remove an element from the list.
+
+On some "variable" elements, a right click will offer a context menu for
+suggested values. As an example, the address field of an endpoint
+descriptor can be chosen from a list of addresses which are not yet taken
+by other endpoints in the same configuration.
 
 You can save the descriptor set to a file or dump it to stdout at any time.
 
@@ -67,4 +75,9 @@ There are possibly some bugs left, and definitely the list of supported
 descriptors is incomplete. Feedback helping to improve things is always
 welcome, preferrably in the form of proper git patches.
 
+There is currently no mailing list to discuss issues around this tool.
+In case of any collaborative work you want to share, contact the author
+of this tool directly:
+
+	usb (at) zonque (dot) org
 
