@@ -274,6 +274,11 @@ def createConfigDescriptor():
 	bitmap.enum = { "No": 0, "Yes": 1 };
 	bitmap.offset = 6
 	elem.appendBitmap(bitmap)
+
+	bitmap = DescriptorElementClass("constant", size = 1, name = "Reserved (set to one)")
+	bitmap.value = 1
+	bitmap.offset = 7
+	elem.appendBitmap(bitmap)
 	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 1, name = "bMaxPower")
