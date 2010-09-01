@@ -242,6 +242,12 @@ class DescriptorClass:
 		return size
 
 	def addElement(self, element):
+		if element.elementType == "bitmap":
+			for b in element.bitmap:
+				if b.elementType == "constant":
+					element.value &= ~(((1 << b.size) - 1) << b.offset)
+					element.value |= b.value << b.offset
+
 		self.elements.append(element)
 
 	def addChild(self, child):
