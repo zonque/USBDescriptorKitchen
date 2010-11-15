@@ -406,6 +406,7 @@ def createEndpointDescriptor():
 	bitmap.enum = { "Data Endpoint": 0, "Feedback Endpoint": 1, "Implcit Feedback Data Endpoint": 3 };
 	bitmap.offset = 2
 	elem.appendBitmap(bitmap)
+	desc.addElement(elem)
 
 	elem = DescriptorElementClass(elementType = "variable", size = 2, name = "wMaxPacketSize")
 	elem.comment = "Maximum packet size this endpoint is capable of sending or receiving when this configuration is selected."
