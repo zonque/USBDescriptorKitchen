@@ -1,5 +1,5 @@
 
-def checkInterfaces(descriptorList, output):
+def basicCheckInterfaces(descriptorList, output):
 	issues = 0
 
 	lastInterface = -1
@@ -25,11 +25,11 @@ def checkInterfaces(descriptorList, output):
 
 	return issues
 
-def doCheck(descriptorList, output):
+def basicCheck(descriptorList, output):
 	issues = 0
 
 	for d in descriptorList:
 		if d.descriptorType == "Configuration":
-			issues += checkInterfaces(d.children, output)
+			issues += basicCheckInterfaces(d.children, output)
 
 	return issues

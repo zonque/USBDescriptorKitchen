@@ -1,5 +1,5 @@
 import wx
-import Basic
+from .Basic import *
 
 class CheckFrame(wx.Frame):
 	def __init__(self, parent, ID, title, pos=wx.DefaultPosition,
@@ -21,8 +21,7 @@ def doCheck(wxParent, descriptorList):
 	win.Show(True)
 	issues = 0
 
-	issues += Basic.doCheck(descriptorList, win.text)
-
+	issues += basicCheck(descriptorList, win.text)
 
 	win.text.AppendText("------------------\n")
 	

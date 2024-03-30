@@ -14,7 +14,7 @@ import Templates.Templates
 import Check.Check
 
 def getVersion():
-	return "0.3"
+	return "0.4"
 
 wildcard = 	"Header Files (*.h)|*h|" \
 		"All files (*)|*"
@@ -117,14 +117,14 @@ class MainFrame(wx.Frame):
 		Check.Check.doCheck(self, self.tree.descriptors)
 
 	def OnDump(self, event):
-		print self.doDump()
+		print(self.doDump())
 
 	def OnFileOpen(self, event):
 		dlg = wx.FileDialog(self, message="Choose a file",
 				    defaultDir=os.getcwd(), 
 				    defaultFile="",
 				    wildcard=wildcard,
-				    style=wx.OPEN | wx.CHANGE_DIR)
+				    style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
 
 		if dlg.ShowModal() == wx.ID_OK:
 			paths = dlg.GetPaths()
@@ -141,12 +141,12 @@ class MainFrame(wx.Frame):
 				    defaultDir=os.getcwd(), 
 				    defaultFile="",
 				    wildcard=wildcard,
-				    style=wx.SAVE | wx.CHANGE_DIR)
+				    style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
 
 		if dlg.ShowModal() == wx.ID_OK:
 			paths = dlg.GetPaths()
 			self.filename = paths[0]
-			fp = file(paths[0], 'w')
+			fp = open(paths[0], 'w')
 			fp.write(self.doDump())
 			fp.close
 
@@ -155,7 +155,7 @@ class MainFrame(wx.Frame):
 			self.OnFileSaveAs(event)
 			return
 
-		fp = file(self.filename, 'w')
+		fp = open(self.filename, 'w')
 		fp.write(self.doDump())
 		fp.close
 

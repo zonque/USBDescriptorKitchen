@@ -222,7 +222,7 @@ def createUAC2OutputTerminalDescriptor():
 	return desc
 
 def createUAC2MixerUnitDescriptor():
-	print "implement me"
+	print("implement me")
 
 def createUAC2SelectorUnitDescriptor():
 	desc = DescriptorClass("UAC2SelectorUnit")

@@ -47,7 +47,7 @@ def reconstructDescriptor(array, descriptorTemplates, state, parentList):
 		off = 0
 		matched = True
 
-		print "trying %s" % t.descriptorType
+		print("trying %s" % t.descriptorType)
 
 		# test if all constant elements in the template descriptor match
 		for e in t.elements:
@@ -61,7 +61,7 @@ def reconstructDescriptor(array, descriptorTemplates, state, parentList):
 				v |= array[off + n] << (n * 8)
 
 			if e.elementType == "constant" and e.value != v:
-				print "  nomatch due to element %s (%d != %d)" % (e.name, e.value, v)
+				print("  nomatch due to element %s (%d != %d)" % (e.name, e.value, v))
 				matched = False
 				break
 
@@ -72,8 +72,7 @@ def reconstructDescriptor(array, descriptorTemplates, state, parentList):
 
 				if not v in enumvals:
 					matched = False
-					print "  nomatch due to element %s (%d not in" % (e.name, v),
-					print enumvals
+					print("  nomatch due to element %s (%d not in %v)" % (e.name, v, enumvals))
 					break
 
 			off += e.size
@@ -114,7 +113,7 @@ def reconstructDescriptors(array, descriptorTemplates, state, parentList):
 		length = array[idx]
 
 		if length == 0:
-			print "bogus descriptors"
+			print("bogus descriptors")
 			return []
 
 		subarray = array[idx:idx+length]
@@ -124,8 +123,7 @@ def reconstructDescriptors(array, descriptorTemplates, state, parentList):
 		if d:
 			l.append(d)
 		else:
-			print "Unable to parse descriptor(s) from array: "
-			print subarray
+			print("Unable to parse descriptor(s) from array: " + subarray)
 
 	return l
 

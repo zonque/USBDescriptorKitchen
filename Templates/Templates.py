@@ -1,7 +1,7 @@
 from Descriptor import *
-from Basic import *
-from Audio import *
-from HID import *
+from . Basic import *
+from . Audio import *
+from . HID import *
 
 def createTemplates():
 	templates = []

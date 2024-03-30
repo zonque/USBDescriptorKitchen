@@ -1,6 +1,6 @@
 import wx
 import copy
-import wx.lib.customtreectrl as CT
+import wx.lib.agw.customtreectrl as CT
 import DescriptorDetailsPanel
 
 class CustomTreeCtrl(CT.CustomTreeCtrl):
@@ -162,7 +162,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 					matched = True
 
 		if matched:
-			#print "matched: %s v %d" % (desc.descriptorType, value)
+			#print("matched: %s v %d" % (desc.descriptorType, value))
 			descriptorList.append((desc, value))
 
 		for c in desc.children:
@@ -201,7 +201,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
 		# traverse up to the configuration descriptor
 		configDescriptor = descriptor.iterateUp("Configuration")
 		if not configDescriptor:
-			print "Oops - no config descriptor?"
+			print("Oops - no config descriptor?")
 			return {}
 
 		if element.suggestionType == "EndpointAddress":

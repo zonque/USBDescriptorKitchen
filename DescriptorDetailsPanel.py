@@ -37,7 +37,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 
 	def createMenu(self, element, items):
 		menu = wx.Menu()
-		for (k, v) in sorted(items, key=lambda(k,v): (v,k)):
+		for (k, v) in sorted(items, key=lambda kv: (kv[0], kv[1])):
 
 			if v != k:
 				title = "%s (%s)" % (k, element.dumpValueNoComma(element.convertToInt(v)))
@@ -92,7 +92,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 		if element.linkType == "MIDIID":
 			return self.descriptorList.findDescriptorsWithFields(["bJackID"], "MIDI")
 
-		print "Missing implementation for link type %s" % element.linkType
+		print("Missing implementation for link type %s" % element.linkType)
 
 	def getSuggestions(self, element):
 		return self.descriptorList.suggestValues(self.descriptor, element)
@@ -115,7 +115,7 @@ class DescriptorDetailsList(treemixin.VirtualTree,
 			p = self.getPossibleLinks(e)
 
 			if not p:
-				print "No possible links for type %s" % e.linkType
+				print("No possible links for type %s" % e.linkType)
 				event.Veto()
 				return
 
